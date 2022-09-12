@@ -21,7 +21,7 @@ REFRESH_TOKEN_EXPIRES_IN = settings.REFRESH_TOKEN_EXPIRES_IN
 async def create_user(payload: schemas.CreateUserSchema):
     user = User.find_one({"email": payload.email.lower()})
     if user:
-        loggerIH.error(f"{status.HTTP_409_CONFLICT} | Account already exist")
+        loggerIH.error(f"{status.HTTP_409_CONFLICT} | Account already exist with this email")
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail="Account already exist")
 
@@ -122,3 +122,4 @@ def allo_logger():
     loggerIH.error(f"{status.HTTP_400_BAD_REQUEST} | Problem")
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Problem")
     return {"message": "allo logger"}
+
