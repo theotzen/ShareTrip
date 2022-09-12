@@ -28,4 +28,4 @@ app.include_router(user.router, tags=['Users'], prefix='/api/users')
 @app.get("/api/healthchecker")
 def root():
     loggerIH.info("Healthchecker good")
-    return {"message": "Connected to MongoDB"}
+    return {"message": "Hello React UI ! Connected to MongoDB"}
