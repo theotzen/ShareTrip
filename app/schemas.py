@@ -7,7 +7,6 @@ from pydantic import BaseModel, EmailStr, constr
 class UserBaseSchema(BaseModel):
     name: str
     email: str
-    photo: str
     role: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
@@ -32,6 +31,5 @@ class UserResponseSchema(UserBaseSchema):
 
 
 class UserResponse(BaseModel):
-    status: str
     user: UserResponseSchema
 

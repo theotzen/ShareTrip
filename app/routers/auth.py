@@ -38,7 +38,7 @@ async def create_user(payload: schemas.CreateUserSchema):
     payload.updated_at = payload.created_at
     result = User.insert_one(payload.dict())
     new_user = userResponseEntity(User.find_one({"_id": result.inserted_id}))
-    return {"status": "success", "user": new_user}
+    return {"user": new_user}
 
 
 @router.post("/login", status_code=status.HTTP_200_OK)
@@ -117,9 +117,4 @@ def logout(response: Response, Authorize: AuthJWT = Depends(), user_id: str = De
     return {"status": "success"}
 
 
-@router.get("/logger", status_code=status.HTTP_200_OK)
-def allo_logger():
-    loggerIH.error(f"{status.HTTP_400_BAD_REQUEST} | Problem")
-    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Problem")
-    return {"message": "allo logger"}
 
