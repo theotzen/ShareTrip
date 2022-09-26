@@ -4,6 +4,9 @@ from app.serializers.userSerializers import userResponseEntity
 
 from app.database import User
 from .. import schemas, oauth2
+from app.core.log_config import init_loggers
+
+loggerIH = init_loggers(__name__)
 
 router = APIRouter()
 
@@ -11,5 +14,5 @@ router = APIRouter()
 @router.get('/me', status_code=status.HTTP_200_OK, response_model=schemas.UserResponse)
 def get_me(user_id: str = Depends(oauth2.require_user)):
     user = userResponseEntity(User.find_one({'_id': ObjectId(str(user_id))}))
-    return {"status": "success", "user": user}
+    return {"user": user}
 

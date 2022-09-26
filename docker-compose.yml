@@ -26,10 +26,15 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    stdin_open: true
+    tty: true
+    restart: always
     volumes:
       - mongo:/data/db
+      - ./db:/data/db:rw
     ports:
       - "27017:27017"
 
 volumes:
   mongo:
+    driver: local
