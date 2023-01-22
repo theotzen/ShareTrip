@@ -3,3 +3,4 @@ venv/
 .env
 logs/
 db/
+example_body.py

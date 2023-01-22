@@ -1,3 +1,6 @@
+# The real problem with mongoDB types is the ObjectID used for id (the "_id") field.
+# The rest is deserialized as a normal python dict
+
 def userEntity(user) -> dict:
     return {
         "id": str(user["_id"]),
@@ -20,6 +23,13 @@ def userResponseEntity(user) -> dict:
         "updated_at": user["updated_at"]
     }
 
+def userResponseEntity_2(user) -> dict:
+    temp_user = user.copy()
+    temp_user["id"] = str(temp_user["_id"])
+    del temp_user["_id"]
+    del temp_user["password"]
+    return temp_user
+
 
 def embeddedUserResponse(user) -> dict:
     return {
@@ -31,4 +41,8 @@ def embeddedUserResponse(user) -> dict:
 
 def userListEntity(users) -> list:
     return [userEntity(user) for user in users]
+
+
+def userResponseListEntity(users) -> list:
+    return [userResponseEntity(user) for user in users]
 

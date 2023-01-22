@@ -1,11 +1,14 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
+from typing import List
+
 from bson.objectid import ObjectId
 from fastapi import APIRouter, Response, status, Depends, HTTPException
 
 from app import oauth2
 from app.database import User
-from app.serializers.userSerializers import userEntity, userResponseEntity
-from .. import schemas, utils
+from app.serializers.user_serializers import userEntity, userResponseEntity_2, userResponseListEntity
+from .. import utils
+from ..schemas import schemas_users
 from app.oauth2 import AuthJWT
 from ..config import settings
 from app.core.log_config import init_loggers
@@ -17,8 +20,10 @@ ACCESS_TOKEN_EXPIRES_IN = settings.ACCESS_TOKEN_EXPIRES_IN
 REFRESH_TOKEN_EXPIRES_IN = settings.REFRESH_TOKEN_EXPIRES_IN
 
 
-@router.post("/register", status_code=status.HTTP_201_CREATED, response_model=schemas.UserResponse)
-async def create_user(payload: schemas.CreateUserSchema):
+@router.post(path="/register",
+             status_code=status.HTTP_201_CREATED,
+             response_model=schemas_users.UserResponse)
+async def create_user(payload: schemas_users.CreateUserSchema):
     user = User.find_one({"email": payload.email.lower()})
     if user:
         loggerIH.error(f"{status.HTTP_409_CONFLICT} | Account already exist with this email")
@@ -34,15 +39,15 @@ async def create_user(payload: schemas.CreateUserSchema):
     del payload.passwordConfirm
     payload.role = "user"
     payload.email = payload.email.lower()
-    payload.created_at = datetime.now()
     payload.updated_at = payload.created_at
     result = User.insert_one(payload.dict())
-    new_user = userResponseEntity(User.find_one({"_id": result.inserted_id}))
+    new_user = userResponseEntity_2(User.find_one({"_id": result.inserted_id}))
     return {"user": new_user}
 
 
-@router.post("/login", status_code=status.HTTP_200_OK)
-def login(payload: schemas.LoginUserSchema, response: Response, Authorize: AuthJWT = Depends()):
+@router.post(path="/login",
+             status_code=status.HTTP_200_OK)
+def login(payload: schemas_users.LoginUserSchema, response: Response, Authorize: AuthJWT = Depends()):
     user = User.find_one({"email": payload.email})
     if not user:
         loggerIH.error(f"{status.HTTP_400_BAD_REQUEST} | Wrong email or password - user not found")
@@ -73,7 +78,8 @@ def login(payload: schemas.LoginUserSchema, response: Response, Authorize: AuthJ
     return {"status": "success", "access_token": access_token}
 
 
-@router.get("/refresh", status_code=status.HTTP_200_OK)
+@router.get(path="/refresh",
+            status_code=status.HTTP_200_OK)
 def refresh_token(response: Response, Authorize: AuthJWT = Depends()):
     try:
         Authorize.jwt_refresh_token_required()
@@ -109,7 +115,8 @@ def refresh_token(response: Response, Authorize: AuthJWT = Depends()):
     return {"access_token": access_token}
 
 
-@router.get("/logout", status_code=status.HTTP_200_OK)
+@router.get(path="/logout",
+            status_code=status.HTTP_200_OK)
 def logout(response: Response, Authorize: AuthJWT = Depends(), user_id: str = Depends(oauth2.require_user)):
     Authorize.unset_jwt_cookies()
     response.set_cookie("logged_in", "", -1)
@@ -117,4 +124,11 @@ def logout(response: Response, Authorize: AuthJWT = Depends(), user_id: str = De
     return {"status": "success"}
 
 
+@router.get(path='/getAllUsers',
+            status_code=status.HTTP_200_OK,
+            response_model=List[schemas_users.UserResponseSchema])
+def get_all_users(user_id: str = Depends(oauth2.require_user)):
+    users = userResponseListEntity(User.find())
+    loggerIH.info(users)
+    return users
 

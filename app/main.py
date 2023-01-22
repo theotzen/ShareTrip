@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import auth, user
+from app.routers import auth, user, trajet
 from app.core.log_config import init_loggers
 
 loggerIH = init_loggers(__name__)
@@ -23,9 +23,10 @@ app.add_middleware(
 
 app.include_router(auth.router, tags=['Auth'], prefix='/api/auth')
 app.include_router(user.router, tags=['Users'], prefix='/api/users')
+app.include_router(trajet.router, tags=['Trajets'], prefix='/api/trajets')
 
 
 @app.get("/api/healthchecker")
 def root():
     loggerIH.info("Healthchecker good")
-    return {"message": "Hello React UI ! Connected to MongoDB"}
+    return {"message": "Connected to MongoDB with Beanie ODM"}

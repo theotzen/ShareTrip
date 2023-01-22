@@ -8,7 +8,7 @@ class UserBaseSchema(BaseModel):
     name: str
     email: str
     role: Optional[str] = None
-    created_at: Optional[datetime] = None
+    created_at: Optional[datetime] = datetime.utcnow()
     updated_at: Optional[datetime] = None
 
     class Config:
@@ -25,6 +25,10 @@ class LoginUserSchema(BaseModel):
     password: constr(min_length=8)
 
 
+class AddSuperAdminSchema(BaseModel):
+    id: str
+
+
 class UserResponseSchema(UserBaseSchema):
     id: str
     pass
@@ -32,4 +36,3 @@ class UserResponseSchema(UserBaseSchema):
 
 class UserResponse(BaseModel):
     user: UserResponseSchema
-

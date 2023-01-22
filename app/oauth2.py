@@ -5,7 +5,7 @@ from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel
 from bson.objectid import ObjectId
 
-from app.serializers.userSerializers import userEntity
+from app.serializers.user_serializers import userEntity
 
 from .database import User
 from .config import settings
@@ -63,3 +63,4 @@ def require_user(Authorize: AuthJWT = Depends()):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="Token is invalid or has expired")
     return user_id
+
