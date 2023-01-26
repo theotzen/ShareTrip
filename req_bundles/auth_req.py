@@ -23,7 +23,7 @@ async def create_user(data: dict, cookies: dict = None, base_url: str = base_url
 	try: 
 		res = await client.post(url=base_url+endpoint, json=jsonable_encoder(data), cookies=cookies)
 		if res.status_code >= 300:
-			raise HTTPException(status_code=res.status_code) 
+			raise HTTPException(status_code=res.status_code, detail=res.json()['detail']) 
 	except httpx.HTTPError as err: 
 		raise SystemExit(err)
 	return res.json()
@@ -33,7 +33,7 @@ async def login(data: dict, cookies: dict = None, base_url: str = base_url, endp
 	try: 
 		res = await client.post(url=base_url+endpoint, json=jsonable_encoder(data), cookies=cookies)
 		if res.status_code >= 300:
-			raise HTTPException(status_code=res.status_code) 
+			raise HTTPException(status_code=res.status_code, detail=res.json()['detail']) 
 	except httpx.HTTPError as err: 
 		raise SystemExit(err)
 	return res.json()
@@ -41,7 +41,9 @@ async def login(data: dict, cookies: dict = None, base_url: str = base_url, endp
 
 async def refresh_token(cookies: dict = None, base_url: str = base_url, endpoint: str = '/api/auth/refresh'):
 	try: 
-		res = await client.get(url=base_url+endpoint) 
+		res = await client.get(url=base_url+endpoint, cookies=cookies)
+		if res.status_code >= 300:
+			raise HTTPException(status_code=res.status_code, detail=res.json()['detail']) 
 	except httpx.HTTPError as err: 
 		raise SystemExit(err)
 	return res.json()
@@ -49,7 +51,9 @@ async def refresh_token(cookies: dict = None, base_url: str = base_url, endpoint
 
 async def logout(cookies: dict = None, base_url: str = base_url, endpoint: str = '/api/auth/logout'):
 	try: 
-		res = await client.get(url=base_url+endpoint) 
+		res = await client.get(url=base_url+endpoint, cookies=cookies)
+		if res.status_code >= 300:
+			raise HTTPException(status_code=res.status_code, detail=res.json()['detail']) 
 	except httpx.HTTPError as err: 
 		raise SystemExit(err)
 	return res.json()
@@ -57,7 +61,9 @@ async def logout(cookies: dict = None, base_url: str = base_url, endpoint: str =
 
 async def get_all_users(cookies: dict = None, base_url: str = base_url, endpoint: str = '/api/auth/getAllUsers'):
 	try: 
-		res = await client.get(url=base_url+endpoint) 
+		res = await client.get(url=base_url+endpoint, cookies=cookies)
+		if res.status_code >= 300:
+			raise HTTPException(status_code=res.status_code, detail=res.json()['detail']) 
 	except httpx.HTTPError as err: 
 		raise SystemExit(err)
 	return res.json()
@@ -65,7 +71,19 @@ async def get_all_users(cookies: dict = None, base_url: str = base_url, endpoint
 
 async def test_trajet(cookies: dict = None, base_url: str = base_url, endpoint: str = '/api/auth/testTrajet'):
 	try: 
-		res = await client.get(url=base_url+endpoint) 
+		res = await client.get(url=base_url+endpoint, cookies=cookies)
+		if res.status_code >= 300:
+			raise HTTPException(status_code=res.status_code, detail=res.json()['detail']) 
+	except httpx.HTTPError as err: 
+		raise SystemExit(err)
+	return res.json()
+
+
+async def test_get_trajet(trajet_id: str, cookies: dict = None, base_url: str = base_url, endpoint: str = '/api/auth/testGetTrajet/'):
+	try: 
+		res = await client.get(url=base_url+endpoint+trajet_id, cookies=cookies)
+		if res.status_code >= 300:
+			raise HTTPException(status_code=res.status_code, detail=res.json()['detail']) 
 	except httpx.HTTPError as err: 
 		raise SystemExit(err)
 	return res.json()
@@ -75,7 +93,7 @@ async def test_post_trajet(data: dict, cookies: dict = None, base_url: str = bas
 	try: 
 		res = await client.post(url=base_url+endpoint, json=jsonable_encoder(data), cookies=cookies)
 		if res.status_code >= 300:
-			raise HTTPException(status_code=res.status_code) 
+			raise HTTPException(status_code=res.status_code, detail=res.json()['detail']) 
 	except httpx.HTTPError as err: 
 		raise SystemExit(err)
 	return res.json()

@@ -74,7 +74,7 @@ async def get_all_trajets_for_current_user_registered(user_id: str = Depends(oau
 @router.get(path="/getTrajet/{trajet_id}",
             status_code=status.HTTP_201_CREATED,
             response_model=schemas_trajets.TrajetResponse)
-def get_trajet(trajet_id: str, user_id: str = Depends(oauth2.require_user)):
+async def get_trajet(trajet_id: str, user_id: str = Depends(oauth2.require_user)):
     loggerIH.info(trajet_id)
     trajet = Trajet.find_one({"_id": ObjectId(trajet_id)})
 

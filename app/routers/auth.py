@@ -5,11 +5,10 @@ from bson.objectid import ObjectId
 from fastapi import APIRouter, Response, status, Depends, HTTPException, Request
 from fastapi.encoders import jsonable_encoder
 
-
 from app import oauth2
 from app.database import User
 from app.serializers.user_serializers import userEntity, userResponseEntity_2, userResponseListEntity
-from req_bundles.trajets_req import get_all_trajets, create_trajet
+from req_bundles.trajets_req import get_all_trajets, create_trajet, get_trajet
 from .. import utils
 from ..schemas import schemas_users, schemas_trajets
 from app.oauth2 import AuthJWT
@@ -142,10 +141,17 @@ async def test_trajet():
     return trajets
 
 
+@router.get(path='/testGetTrajet/{trajet_id}',
+            status_code=status.HTTP_200_OK)
+async def test_get_trajet(trajet_id: str, request: Request):
+    cookie = {'access_token': request.cookies['access_token']}
+    trajets = await get_trajet(trajet_id, cookies=cookie)
+    return trajets
+
+
 @router.post(path='/testPostTrajet',
              status_code=status.HTTP_201_CREATED)
 async def test_post_trajet(payload: schemas_trajets.CreateTrajetSchema, request: Request):
     cookie = {'access_token': request.cookies['access_token']}
     posted_trajets = await create_trajet(data=payload, cookies=cookie)
     return posted_trajets
-
