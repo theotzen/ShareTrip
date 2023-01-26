@@ -20,7 +20,7 @@ router = APIRouter()
 @router.get(path='/getAllTrajets',
             status_code=status.HTTP_200_OK,
             response_model=List[schemas_trajets.TrajetResponseSchema])
-async def get_all_trajets(user_id: str = Depends(oauth2.require_user)):
+async def get_all_trajets():
     trajets = Trajet.find()
     if not trajets:
         loggerIH.error(f"{status.HTTP_404_NOT_FOUND} | No such trip has been found")

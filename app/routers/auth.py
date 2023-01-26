@@ -2,13 +2,16 @@ from datetime import timedelta
 from typing import List
 
 from bson.objectid import ObjectId
-from fastapi import APIRouter, Response, status, Depends, HTTPException
+from fastapi import APIRouter, Response, status, Depends, HTTPException, Request
+from fastapi.encoders import jsonable_encoder
+
 
 from app import oauth2
 from app.database import User
 from app.serializers.user_serializers import userEntity, userResponseEntity_2, userResponseListEntity
+from req_bundles.trajets_req import get_all_trajets, create_trajet
 from .. import utils
-from ..schemas import schemas_users
+from ..schemas import schemas_users, schemas_trajets
 from app.oauth2 import AuthJWT
 from ..config import settings
 from app.core.log_config import init_loggers
@@ -127,8 +130,22 @@ def logout(response: Response, Authorize: AuthJWT = Depends(), user_id: str = De
 @router.get(path='/getAllUsers',
             status_code=status.HTTP_200_OK,
             response_model=List[schemas_users.UserResponseSchema])
-def get_all_users(user_id: str = Depends(oauth2.require_user)):
+async def get_all_users(user_id: str = Depends(oauth2.require_user)):
     users = userResponseListEntity(User.find())
-    loggerIH.info(users)
     return users
+
+
+@router.get(path='/testTrajet',
+            status_code=status.HTTP_200_OK)
+async def test_trajet():
+    trajets = await get_all_trajets()
+    return trajets
+
+
+@router.post(path='/testPostTrajet',
+             status_code=status.HTTP_201_CREATED)
+async def test_post_trajet(payload: schemas_trajets.CreateTrajetSchema, request: Request):
+    cookie = {'access_token': request.cookies['access_token']}
+    posted_trajets = await create_trajet(data=payload, cookies=cookie)
+    return posted_trajets
 
