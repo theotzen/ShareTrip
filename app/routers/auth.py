@@ -3,17 +3,15 @@ from typing import List
 
 from bson.objectid import ObjectId
 from fastapi import APIRouter, Response, status, Depends, HTTPException, Request
-from fastapi.encoders import jsonable_encoder
 
-from app import oauth2
+from app.core.log_config import init_loggers
 from app.database import User
+from app.oauth2 import AuthJWT, require_user
 from app.serializers.user_serializers import userEntity, userResponseEntity_2, userResponseListEntity
 from req_bundles.trajets_req import get_all_trajets, create_trajet, get_trajet
 from .. import utils
-from ..schemas import schemas_users, schemas_trajets
-from app.oauth2 import AuthJWT
 from ..config import settings
-from app.core.log_config import init_loggers
+from ..schemas import schemas_users, schemas_trajets
 
 loggerIH = init_loggers(__name__)
 
@@ -49,7 +47,9 @@ async def create_user(payload: schemas_users.CreateUserSchema):
 
 @router.post(path="/login",
              status_code=status.HTTP_200_OK)
-def login(payload: schemas_users.LoginUserSchema, response: Response, Authorize: AuthJWT = Depends()):
+def login(payload: schemas_users.LoginUserSchema,
+          response: Response,
+          Authorize: AuthJWT = Depends()):
     user = User.find_one({"email": payload.email})
     if not user:
         loggerIH.error(f"{status.HTTP_400_BAD_REQUEST} | Wrong email or password - user not found")
@@ -82,7 +82,8 @@ def login(payload: schemas_users.LoginUserSchema, response: Response, Authorize:
 
 @router.get(path="/refresh",
             status_code=status.HTTP_200_OK)
-def refresh_token(response: Response, Authorize: AuthJWT = Depends()):
+def refresh_token(response: Response,
+                  Authorize: AuthJWT = Depends()):
     try:
         Authorize.jwt_refresh_token_required()
 
@@ -119,7 +120,9 @@ def refresh_token(response: Response, Authorize: AuthJWT = Depends()):
 
 @router.get(path="/logout",
             status_code=status.HTTP_200_OK)
-def logout(response: Response, Authorize: AuthJWT = Depends(), user_id: str = Depends(oauth2.require_user)):
+def logout(response: Response,
+           Authorize: AuthJWT = Depends(),
+           user_id: str = Depends(require_user)):
     Authorize.unset_jwt_cookies()
     response.set_cookie("logged_in", "", -1)
 
@@ -129,7 +132,7 @@ def logout(response: Response, Authorize: AuthJWT = Depends(), user_id: str = De
 @router.get(path='/getAllUsers',
             status_code=status.HTTP_200_OK,
             response_model=List[schemas_users.UserResponseSchema])
-async def get_all_users(user_id: str = Depends(oauth2.require_user)):
+async def get_all_users(user_id: str = Depends(require_user)):
     users = userResponseListEntity(User.find())
     return users
 
@@ -143,15 +146,19 @@ async def test_trajet():
 
 @router.get(path='/testGetTrajet/{trajet_id}',
             status_code=status.HTTP_200_OK)
-async def test_get_trajet(trajet_id: str, request: Request):
-    cookie = {'access_token': request.cookies['access_token']}
+async def test_get_trajet(trajet_id: str,
+                          request: Request,
+                          user_id=Depends(require_user)):
+    cookie = dict(access_token=request.cookies['access_token'])
     trajets = await get_trajet(trajet_id, cookies=cookie)
     return trajets
 
 
 @router.post(path='/testPostTrajet',
              status_code=status.HTTP_201_CREATED)
-async def test_post_trajet(payload: schemas_trajets.CreateTrajetSchema, request: Request):
-    cookie = {'access_token': request.cookies['access_token']}
+async def test_post_trajet(payload: schemas_trajets.CreateTrajetSchema,
+                           request: Request,
+                           user_id: str = Depends(require_user)):
+    cookie = dict(access_token=request.cookies['access_token'])
     posted_trajets = await create_trajet(data=payload, cookies=cookie)
     return posted_trajets

@@ -4,7 +4,6 @@ from typing import List
 from bson.objectid import ObjectId
 from fastapi import APIRouter, status, Depends, HTTPException
 
-from app import oauth2
 from app.core.log_config import init_loggers
 from app.database import Trajet
 from app.oauth2 import require_user
@@ -33,7 +32,7 @@ async def get_all_trajets():
 @router.get(path='/getAllTrajetsForCurrentUser',
             status_code=status.HTTP_200_OK,
             response_model=List[schemas_trajets.TrajetResponseSchema])
-async def get_all_trajets_for_current_user(user_id: str = Depends(oauth2.require_user)):
+async def get_all_trajets_for_current_user(user_id: str = Depends(require_user)):
     trajets = Trajet.find({"user_id": user_id})
     if not trajets:
         loggerIH.error(f"{status.HTTP_404_NOT_FOUND} | No such trip has been found")
@@ -45,7 +44,7 @@ async def get_all_trajets_for_current_user(user_id: str = Depends(oauth2.require
 @router.get(path='/getLatestTrajetForCurrentUser',
             status_code=status.HTTP_200_OK,
             response_model=schemas_trajets.TrajetResponse)
-async def get_latest_trajet_for_current_user(user_id: str = Depends(oauth2.require_user)):
+async def get_latest_trajet_for_current_user(user_id: str = Depends(require_user)):
     trajet = Trajet.find_one({
         "user_id": user_id,
         "created_at": {"$gte": datetime.utcnow() - timedelta(minutes=30)}
@@ -60,7 +59,7 @@ async def get_latest_trajet_for_current_user(user_id: str = Depends(oauth2.requi
 @router.get(path='/getAllTrajetsCurrentUserIsRegisteredIn',
             status_code=status.HTTP_200_OK,
             response_model=List[schemas_trajets.TrajetResponseSchema])
-async def get_all_trajets_for_current_user_registered(user_id: str = Depends(oauth2.require_user)):
+async def get_all_trajets_for_current_user_registered(user_id: str = Depends(require_user)):
     trajets = Trajet.find({
         "users_registered": user_id,
     })
@@ -74,7 +73,7 @@ async def get_all_trajets_for_current_user_registered(user_id: str = Depends(oau
 @router.get(path="/getTrajet/{trajet_id}",
             status_code=status.HTTP_201_CREATED,
             response_model=schemas_trajets.TrajetResponse)
-async def get_trajet(trajet_id: str, user_id: str = Depends(oauth2.require_user)):
+async def get_trajet(trajet_id: str, user_id: str = Depends(require_user)):
     loggerIH.info(trajet_id)
     trajet = Trajet.find_one({"_id": ObjectId(trajet_id)})
 

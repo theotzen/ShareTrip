@@ -4,3 +4,4 @@ venv/
 logs/
 db/
 example_body.py
+.idea/
