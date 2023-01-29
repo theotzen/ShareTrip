@@ -19,7 +19,7 @@ router = APIRouter()
 @router.get(path='/getAllTrajets',
             status_code=status.HTTP_200_OK,
             response_model=List[schemas_trajets.TrajetResponseSchema])
-async def get_all_trajets():
+async def get_all_trajets(user_id: str = Depends(require_user)):
     trajets = Trajet.find()
     if not trajets:
         loggerIH.error(f"{status.HTTP_404_NOT_FOUND} | No such trip has been found")
@@ -73,7 +73,8 @@ async def get_all_trajets_for_current_user_registered(user_id: str = Depends(req
 @router.get(path="/getTrajet/{trajet_id}",
             status_code=status.HTTP_201_CREATED,
             response_model=schemas_trajets.TrajetResponse)
-async def get_trajet(trajet_id: str, user_id: str = Depends(require_user)):
+async def get_trajet(trajet_id: str,
+                     user_id: str = Depends(require_user)):
     loggerIH.info(trajet_id)
     trajet = Trajet.find_one({"_id": ObjectId(trajet_id)})
 
@@ -88,7 +89,8 @@ async def get_trajet(trajet_id: str, user_id: str = Depends(require_user)):
 @router.post(path="/createTrajet",
              status_code=status.HTTP_201_CREATED,
              response_model=schemas_trajets.TrajetResponse)
-async def create_trajet(payload: schemas_trajets.CreateTrajetSchema, user_id: str = Depends(require_user)):
+async def create_trajet(payload: schemas_trajets.CreateTrajetSchema,
+                        user_id: str = Depends(require_user)):
     # Get possible registered-in-thirty-minutes trip for current user and raise
     trajet = Trajet.find_one({
         "user_id": user_id,
@@ -121,7 +123,8 @@ async def create_trajet(payload: schemas_trajets.CreateTrajetSchema, user_id: st
 
 @router.put(path="/updateTrajet",
             status_code=status.HTTP_201_CREATED)
-async def update_trajet(payload: schemas_trajets.TrajetUpdateSchema, user_id: str = Depends(require_user)):
+async def update_trajet(payload: schemas_trajets.TrajetUpdateSchema,
+                        user_id: str = Depends(require_user)):
     trajet = Trajet.find_one({"_id": ObjectId(payload.id)})
     if not trajet:
         loggerIH.error(f"{status.HTTP_404_NOT_FOUND} | No such trip has been found")
@@ -154,7 +157,8 @@ async def update_trajet(payload: schemas_trajets.TrajetUpdateSchema, user_id: st
 
 @router.delete(path="/deleteTrajet/{trajet_id}",
                status_code=status.HTTP_200_OK)
-async def delete_trajet(trajet_id: str, user_id: str = Depends(require_user)):
+async def delete_trajet(trajet_id: str,
+                        user_id: str = Depends(require_user)):
     trajet = Trajet.find_one({"_id": ObjectId(trajet_id)})
     if not trajet:
         loggerIH.error(f"{status.HTTP_404_NOT_FOUND} | No such trip has been found")

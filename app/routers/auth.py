@@ -139,8 +139,10 @@ async def get_all_users(user_id: str = Depends(require_user)):
 
 @router.get(path='/testTrajet',
             status_code=status.HTTP_200_OK)
-async def test_trajet():
-    trajets = await get_all_trajets()
+async def test_trajet(request: Request,
+                      user_id: str = Depends(require_user)):
+    cookie = dict(access_token=request.cookies['access_token'])
+    trajets = await get_all_trajets(cookies=cookie)
     return trajets
 
 
