@@ -1,15 +1,13 @@
 from datetime import datetime
 from typing import Optional, List
 
-from pydantic import BaseModel, EmailStr, constr, validator
-
+from pydantic import BaseModel, validator
 
 list_of_allowed_departure_places: List[str] = ['Gare de Lyon', 'Gare Saint-Lazare', 'Gare Montparnasse']
 list_locomotion: List[str] = ['Voiture', 'Taxi', 'VTC', 'Moto']
 
 
 class TrajetBaseSchema(BaseModel):
-
     # creator
     user_id: str
 
@@ -24,7 +22,7 @@ class TrajetBaseSchema(BaseModel):
 
     # trip info
     locomotion: str
-    seats_left: int
+    seats_available: int
     users_registered: List[str]
     total_price_to_share: Optional[float]
     linked_chat_id: Optional[str]
@@ -35,13 +33,15 @@ class TrajetBaseSchema(BaseModel):
         orm_mode = True
 
     @validator("departure_place")
-    def validate_departure_place(cls, value):
+    def validate_departure_place(cls,
+                                 value):
         if value not in list_of_allowed_departure_places:
             raise ValueError("Our terms strictly prohobit non-allowed departure places")
         return value
 
     @validator("locomotion")
-    def validate_locomotion(cls, value):
+    def validate_locomotion(cls,
+                            value):
         if value not in list_locomotion:
             raise ValueError("Our terms strictly prohobit non-allowed locomotion types")
         return value
@@ -60,7 +60,7 @@ class CreateTrajetSchema(BaseModel):
 
     # trip info
     locomotion: str
-    seats_left: int
+    seats_available: int
     total_price_to_share: Optional[float]
 
     users_registered: Optional[List[str]]
@@ -81,9 +81,38 @@ class TrajetUpdateSchema(BaseModel):
     arrival_postal_code: Optional[str]
 
     locomotion: Optional[str]
-    seats_left: Optional[int]
+    seats_available: Optional[int]
     total_price_to_share: Optional[float]
     updated_at: Optional[datetime] = datetime.utcnow()
+
+
+class JoinTrajetSchema(BaseModel):
+    # Trajet id
+    id: str
+
+    # Number of seats to be reserved
+    number_seats: Optional[int] = 1
+
+
+class RemoveUserFromTrajetSchema(BaseModel):
+    # Trajet id
+    id: str
+
+    # User id
+    user_id: str
+
+
+class RemoveUsersFromTrajetSchema(BaseModel):
+    # Trajet id
+    id: str
+
+    # User id
+    user_ids: List[str]
+
+
+class RemoveAuthenticatedUserFromTrajetSchema(BaseModel):
+    # Trajet id
+    id: str
 
 
 class TrajetResponseSchema(TrajetBaseSchema):

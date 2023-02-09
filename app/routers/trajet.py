@@ -122,7 +122,7 @@ async def create_trajet(payload: schemas_trajets.CreateTrajetSchema,
 
 
 @router.put(path="/updateTrajet",
-            status_code=status.HTTP_201_CREATED)
+            status_code=status.HTTP_200_OK)
 async def update_trajet(payload: schemas_trajets.TrajetUpdateSchema,
                         user_id: str = Depends(require_user)):
     trajet = Trajet.find_one({"_id": ObjectId(payload.id)})
@@ -184,3 +184,212 @@ async def delete_trajet(trajet_id: str,
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                             detail="Transaction not acknowledged")
     return {"deleted_count": result.deleted_count}
+
+
+@router.put(path="/joinTrajet",
+            status_code=status.HTTP_200_OK)
+async def join_trajet(payload: schemas_trajets.JoinTrajetSchema,
+                      user_id: str = Depends(require_user)):
+    trajet = Trajet.find_one({"_id": ObjectId(payload.id)})
+    if not trajet:
+        loggerIH.error(f"{status.HTTP_404_NOT_FOUND} | No such trip has been found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="No such trip has been found")
+
+    if datetime.utcnow() - timedelta(hours=12) > trajet["created_at"]:
+        loggerIH.error(f"{status.HTTP_405_METHOD_NOT_ALLOWED} | Trip too old")
+        raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                            detail="Trip too old")
+
+    if datetime.utcnow() - timedelta(minutes=30) > trajet["departure_time"]:
+        loggerIH.error(f"{status.HTTP_405_METHOD_NOT_ALLOWED} | Departure date is passed")
+        raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                            detail="Departure date is passed")
+
+    trajet = trajetResponseEntity(trajet)
+
+    already_taken_seats_not_counting_creator = len(trajet['users_registered']) - 1
+
+    seats_left = trajet['seats_available'] - already_taken_seats_not_counting_creator
+
+    if seats_left < 0:
+        loggerIH.error(f"{status.HTTP_500_INTERNAL_SERVER_ERROR} | Too many users registered")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="Too many users registered")
+
+    if seats_left == 0:
+        loggerIH.error(f"{status.HTTP_405_METHOD_NOT_ALLOWED} | Trajet is full")
+        raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                            detail="Trajet is full")
+
+    if (seats_left > 0) and \
+            (seats_left < payload.number_seats):
+        loggerIH.error(f"{status.HTTP_405_METHOD_NOT_ALLOWED} | Not enough seats available")
+        raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                            detail="Not enough seats available")
+
+    if user_id in trajet['users_registered']:
+        loggerIH.error(f"{status.HTTP_405_METHOD_NOT_ALLOWED} | User already registered in trajet")
+        raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                            detail="User already registered in trajet")
+
+    to_add_to_user_registered = [f"{user_id}_{i}" if i != 0 else user_id for i in range(payload.number_seats)]
+
+    result = Trajet.update_one(
+        {
+            "_id": ObjectId(payload.id)
+        },
+        {
+            "$push": {"users_registered": {"$each": to_add_to_user_registered}}
+        }
+    )
+    if not result.acknowledged:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="Transaction not acknowledged")
+    return {"modified_count": result.modified_count}
+
+
+@router.put(path="/removeUserFromTrajet",
+            status_code=status.HTTP_200_OK)
+async def remove_user_from_trajet(payload: schemas_trajets.RemoveUserFromTrajetSchema,
+                                  auth: str = Depends(require_user)):
+    trajet = Trajet.find_one({"_id": ObjectId(payload.id)})
+    if not trajet:
+        loggerIH.error(f"{status.HTTP_404_NOT_FOUND} | No such trip has been found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="No such trip has been found")
+
+    if datetime.utcnow() - timedelta(hours=12) > trajet["created_at"]:
+        loggerIH.error(f"{status.HTTP_405_METHOD_NOT_ALLOWED} | Trip too old")
+        raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                            detail="Trip too old")
+
+    if datetime.utcnow() - timedelta(minutes=30) > trajet["departure_time"]:
+        loggerIH.error(f"{status.HTTP_405_METHOD_NOT_ALLOWED} | Departure date is passed")
+        raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                            detail="Departure date is passed")
+
+    trajet = trajetResponseEntity(trajet)
+
+    if payload.user_id not in trajet['users_registered']:
+        loggerIH.error(f"{status.HTTP_405_METHOD_NOT_ALLOWED} | User not registered in trajet")
+        raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                            detail="User not registered in trajet")
+
+    if payload.user_id == trajet['user_id']:
+        loggerIH.error(f"{status.HTTP_405_METHOD_NOT_ALLOWED} | You can't unregister if you created the trajet")
+        raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                            detail="You can't unregister if you created the trajet")
+
+    # Need to unregister all related seats taken {user_id}_1
+    to_remove_users = [usid for usid in trajet['users_registered'] if payload.user_id in usid]
+
+    result = Trajet.update_one(
+        {
+            "_id": ObjectId(payload.id)
+        },
+        {
+            "$pull": {"users_registered": {"$in": to_remove_users}}
+        }
+    )
+    if not result.acknowledged:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="Transaction not acknowledged")
+    return {"modified_count": result.modified_count}
+
+
+@router.put(path="/removeUsersFromTrajet",
+            status_code=status.HTTP_200_OK)
+async def remove_users_from_trajet(payload: schemas_trajets.RemoveUsersFromTrajetSchema,
+                                   auth: str = Depends(require_user)):
+    trajet = Trajet.find_one({"_id": ObjectId(payload.id)})
+    if not trajet:
+        loggerIH.error(f"{status.HTTP_404_NOT_FOUND} | No such trip has been found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="No such trip has been found")
+
+    if datetime.utcnow() - timedelta(hours=12) > trajet["created_at"]:
+        loggerIH.error(f"{status.HTTP_405_METHOD_NOT_ALLOWED} | Trip too old")
+        raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                            detail="Trip too old")
+
+    if datetime.utcnow() - timedelta(minutes=30) > trajet["departure_time"]:
+        loggerIH.error(f"{status.HTTP_405_METHOD_NOT_ALLOWED} | Departure date is passed")
+        raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                            detail="Departure date is passed")
+
+    trajet = trajetResponseEntity(trajet)
+
+    # if any user_id is not in the registered ids, raise
+    if any(usid not in trajet['users_registered'] for usid in payload.user_ids):
+        loggerIH.error(f"{status.HTTP_405_METHOD_NOT_ALLOWED} | At least a user not registered in trajet")
+        raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                            detail="At least a user not registered in trajet")
+
+    # if creator id is in user_ids, raise
+    if not all(usid != trajet['user_id'] for usid in payload.user_ids):
+        loggerIH.error(f"{status.HTTP_405_METHOD_NOT_ALLOWED} | Can't unregister the creator")
+        raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                            detail="Can't unregister the creator")
+
+    result = Trajet.update_one(
+        {
+            "_id": ObjectId(payload.id)
+        },
+        {
+            "$pull": {"users_registered": {"$in": payload.user_ids}}
+        }
+    )
+    if not result.acknowledged:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="Transaction not acknowledged")
+    return {"modified_count": result.modified_count}
+
+
+@router.put(path="/removeMeFromTrajet",
+            status_code=status.HTTP_200_OK)
+async def remove_me_from_trajet(payload: schemas_trajets.RemoveAuthenticatedUserFromTrajetSchema,
+                                user_id: str = Depends(require_user)):
+    trajet = Trajet.find_one({"_id": ObjectId(payload.id)})
+    if not trajet:
+        loggerIH.error(f"{status.HTTP_404_NOT_FOUND} | No such trip has been found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="No such trip has been found")
+
+    if datetime.utcnow() - timedelta(hours=12) > trajet["created_at"]:
+        loggerIH.error(f"{status.HTTP_405_METHOD_NOT_ALLOWED} | Trip too old")
+        raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                            detail="Trip too old")
+
+    if datetime.utcnow() - timedelta(minutes=30) > trajet["departure_time"]:
+        loggerIH.error(f"{status.HTTP_405_METHOD_NOT_ALLOWED} | Departure date is passed")
+        raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                            detail="Departure date is passed")
+
+    trajet = trajetResponseEntity(trajet)
+
+    if user_id not in trajet['users_registered']:
+        loggerIH.error(f"{status.HTTP_405_METHOD_NOT_ALLOWED} | User not registered in trajet")
+        raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                            detail="User not registered in trajet")
+
+    if user_id == trajet['user_id']:
+        loggerIH.error(f"{status.HTTP_405_METHOD_NOT_ALLOWED} | You can't unregister if you created the trajet")
+        raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                            detail="You can't unregister if you created the trajet")
+
+    # Need to unregister all related seats taken like {user_id}_1
+    to_remove_users = [usid for usid in trajet['users_registered'] if user_id in usid]
+
+    result = Trajet.update_one(
+        {
+            "_id": ObjectId(payload.id)
+        },
+        {
+            "$pull": {"users_registered": {"$in": to_remove_users}}
+        }
+    )
+    if not result.acknowledged:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="Transaction not acknowledged")
+    return {"modified_count": result.modified_count}
