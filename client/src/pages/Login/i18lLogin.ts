@@ -1,0 +1,38 @@
+
+    export const loginFr = {
+        login: 'Connexion',
+		register: "S'inscrire",
+        noaccount: 'Pas encore de compte ?   ',
+		account: 'Déjà un compte ?   ',
+        registerhere: 'Créer un compte   ',
+		loginhere: 'Se connecter',
+        email: 'Adresse email',
+        password: 'Mot de passe',
+        connexion: 'Se connecter',
+		signup: "S'inscrire",
+    	confirm: 'Confirmer mot de passe',
+		name: 'Nom',
+		logout: 'Déconnexion',
+		passwordsNotMatching: 'Les mots de passe sont différents',
+		passwordEightChar: 'Le mot de passe doit dépasser 8 caractères',
+		allFields: 'Tous les champs sont obligatoires', 
+    }
+
+    export const loginEn = {
+		login: 'Connexion',
+		register: "Register",
+        noaccount: 'No account yet?   ',
+		account: 'Already have an account?   ',
+        registerhere: 'Register in here',
+		loginhere: 'Login in here',
+        email: 'Email address',
+        password: 'Password',
+        connexion: 'Log in',
+		signup: "Register",
+    	confirm: 'Confirm password',
+		name: 'Name',
+		logout: 'Log out',
+		passwordsNotMatching: 'Passwords not matching',
+		passwordEightChar: 'Password must be at least 8 characters',
+		allFields: 'All fields are required', 
+    };
