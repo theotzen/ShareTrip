@@ -1,14 +1,14 @@
 from datetime import timedelta
 from typing import List
 
+from app.core.log_config import init_loggers
+from app.database import User
+from app.oauth2 import AuthJWT, require_user
+from app.serializers.user_serializers import userEntity, userResponseEntity_2, userResponseListEntity
 from bson.objectid import ObjectId
 from fastapi import APIRouter, Response, status, Depends, HTTPException, Request
+from req_bundles.trajets_req import get_all_trajets, create_trajet, get_trajet
 
-from backend.app.core.log_config import init_loggers
-from backend.app.database import User
-from backend.app.oauth2 import AuthJWT, require_user
-from backend.app.serializers.user_serializers import userEntity, userResponseEntity_2, userResponseListEntity
-from backend.req_bundles.trajets_req import get_all_trajets, create_trajet, get_trajet
 from .. import utils
 from ..config import settings
 from ..schemas import schemas_users, schemas_trajets

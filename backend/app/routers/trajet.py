@@ -1,12 +1,12 @@
 from datetime import timedelta, datetime
 from typing import List
 
+from app.core.log_config import init_loggers
+from app.database import Trajet
+from app.oauth2 import require_user
 from bson.objectid import ObjectId
 from fastapi import APIRouter, status, Depends, HTTPException
 
-from backend.app.core.log_config import init_loggers
-from backend.app.database import Trajet
-from backend.app.oauth2 import require_user
 from ..schemas import schemas_trajets
 from ..serializers.trajet_serializers import trajetResponseListEntity, trajetResponseEntity
 from ..utils import clean_update_trajets_payload
@@ -18,9 +18,11 @@ router = APIRouter()
 
 @router.get(path='/getAllTrajets',
             status_code=status.HTTP_200_OK,
-            response_model=List[schemas_trajets.TrajetResponseSchema])
+            # response_model=List[schemas_trajets.TrajetResponseSchema]
+            )
 async def get_all_trajets(user_id: str = Depends(require_user)):
     trajets = Trajet.find()
+    loggerIH.info(trajets)
     if not trajets:
         loggerIH.error(f"{status.HTTP_404_NOT_FOUND} | No such trip has been found")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,

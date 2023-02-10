@@ -1,6 +1,5 @@
+from app.core.log_config import init_loggers
 from passlib.context import CryptContext
-
-from backend.app.core.log_config import init_loggers
 
 loggerIH = init_loggers(__name__)
 

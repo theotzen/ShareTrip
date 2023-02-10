@@ -1,13 +1,13 @@
 import base64
 from typing import List
 
+from app.core.log_config import init_loggers
+from app.serializers.user_serializers import userEntity
 from bson.objectid import ObjectId
 from fastapi import Depends, HTTPException, status
 from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel
 
-from backend.app.core.log_config import init_loggers
-from backend.app.serializers.user_serializers import userEntity
 from .config import settings
 from .database import User
 

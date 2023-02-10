@@ -1,9 +1,8 @@
+from app.config import settings
+from app.core.log_config import init_loggers
+from app.routers import auth, user, trajet
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-from backend.app.config import settings
-from backend.app.core.log_config import init_loggers
-from backend.app.routers import auth, user, trajet
 
 loggerIH = init_loggers(__name__)
 

@@ -1,9 +1,9 @@
+from app.core.log_config import init_loggers
+from app.database import User
+from app.serializers.user_serializers import userResponseEntity
 from bson.objectid import ObjectId
 from fastapi import APIRouter, Depends, status
 
-from backend.app.core.log_config import init_loggers
-from backend.app.database import User
-from backend.app.serializers.user_serializers import userResponseEntity
 from .. import oauth2
 from ..schemas import schemas_users
 

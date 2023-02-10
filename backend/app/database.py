@@ -1,8 +1,7 @@
 import pymongo
+from app.config import settings
+from app.core.log_config import init_loggers
 from pymongo import mongo_client
-
-from backend.app.config import settings
-from backend.app.core.log_config import init_loggers
 
 loggerIH = init_loggers(__name__)
 
