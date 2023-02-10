@@ -18,8 +18,7 @@ router = APIRouter()
 
 @router.get(path='/getAllTrajets',
             status_code=status.HTTP_200_OK,
-            # response_model=List[schemas_trajets.TrajetResponseSchema]
-            )
+            response_model=List[schemas_trajets.TrajetResponseSchema])
 async def get_all_trajets(user_id: str = Depends(require_user)):
     trajets = Trajet.find()
     loggerIH.info(trajets)
