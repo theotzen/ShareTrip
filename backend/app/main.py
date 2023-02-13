@@ -28,4 +28,4 @@ app.include_router(trajet.router, tags=['Trajets'], prefix='/api/trajets')
 @app.get("/api/healthchecker")
 def root():
     loggerIH.info("Healthchecker good")
-    return {"message": "Connected to MongoDB with Beanie ODM"}
+    return {"message": "Connected to MongoDB from shareTrip backend"}

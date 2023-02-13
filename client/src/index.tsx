@@ -4,6 +4,8 @@ import { IntlProvider } from 'react-intl';
 import App from './App';
 import messages from './messages';
 
+window.React = React
+
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
 );

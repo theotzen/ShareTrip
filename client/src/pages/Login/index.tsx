@@ -4,6 +4,7 @@ import LoginForm from '../../components/LoginForm';
 import RegisterForm from '../../components/RegisterForm';
 import * as styles from './style';
 
+
 export default function Login() {
     const [isLogin, setIsLogin] = useState<boolean>(true);
     const intl = useIntl();
