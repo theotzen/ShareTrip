@@ -3,7 +3,6 @@ import { useIntl } from 'react-intl';
 import LoginForm from '../../components/LoginForm';
 import RegisterForm from '../../components/RegisterForm';
 import * as styles from './style';
-import React from 'react';
 
 
 export default function Login() {
