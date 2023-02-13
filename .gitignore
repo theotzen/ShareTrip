@@ -4,4 +4,6 @@
 ./backend/db/
 ./backend/example_body.py
 .idea/
-/backend/venv/
+./backend/venv/
+client/.env
+.env

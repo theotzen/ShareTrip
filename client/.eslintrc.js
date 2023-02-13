@@ -44,6 +44,8 @@ module.exports = {
         'prettier',
         'plugin:@typescript-eslint/eslint-recommended',
         'plugin:@typescript-eslint/recommended',
+        'plugin:react/recommended',
+        'plugin:react/jsx-runtime'
     ],
     parser: '@babel/eslint-parser',
     parserOptions: {
