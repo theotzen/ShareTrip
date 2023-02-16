@@ -9,6 +9,7 @@ services:
       - 3000:3000
     networks:
       - sharetrip-network
+      - chatapp-network
     volumes:
       - ./client/src:/usr/app/src
       - ./client/public:/usr/app/public
@@ -17,7 +18,7 @@ services:
     environment:
       - REACT_APP_SERVER=http://localhost:8000
       - CHOKIDAR_USEPOLLING=true
-    command: yarn start
+    command: npm start
     stdin_open: true
     tty: true
   
@@ -37,6 +38,8 @@ services:
       - ./backend:/app
     environment:
       - CLIENT=http://localhost:3000
+    depends_on:
+      - mongo
     command: bash -c "
       uvicorn app.main:app 
       --host 0.0.0.0 
@@ -62,12 +65,60 @@ services:
       - ./backend/db:/data/db:rw
     ports:
       - "27017:27017"
+  
+  chatapp:
+    build:
+      context: ./chatapp
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - 9000:9000
+    expose:
+    - "9000"
+    networks:
+      - chatapp-network
+    volumes:
+      - ./chatapp:/app
+    environment:
+      - CLIENT=http://localhost:3000
+    depends_on:
+      - mongochatapp
+    command: bash -c "
+      uvicorn app.main:app 
+      --host 0.0.0.0 
+      --port 9000 
+      --reload"
+
+  mongochatapp:
+    image: mongo:latest
+    container_name: mongochatapp
+    env_file:
+      - .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME_CHATAPP}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD_CHATAPP}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE_CHATAPP}
+    networks:
+      - chatapp-network
+    stdin_open: true
+    tty: true
+    restart: always
+    volumes:
+      - mongochatapp:/data/db
+      - ./chatapp/db:/data/db:rw
+    ports:
+      - "27018:27017"
 
 
 networks:
   sharetrip-network:
     driver: bridge
+  chatapp-network:
+    driver: bridge
 
 volumes:
   mongo:
+    driver: local
+  mongochatapp:
     driver: local
