@@ -110,7 +110,7 @@ async def create_trajet(payload: schemas_trajets.CreateTrajetSchema,
                             detail="Only future trips are allowed")
 
     if payload.departure_time - timedelta(hours=12) > datetime.utcnow():
-        loggerIH.error(f"{status.HTTP_425_TOO_EARLY} | Trip registration too early")
+        loggerIH.error(f"{status.HTTP_425_TOO_EARLY} | Trip registration is too early")
         raise HTTPException(status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
                             detail="Trip registration too early")
 
