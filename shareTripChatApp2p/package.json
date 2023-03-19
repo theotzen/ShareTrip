@@ -1,0 +1,25 @@
+{
+  "name": "sharetripchatapp",
+  "version": "1.0.0",
+  "description": "Chat app for shareTrip project",
+  "main": "server.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx nodemon server.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "http": "^0.0.1-security",
+    "mongoose": "^6.9.0",
+    "nodemon": "^2.0.21",
+    "socket.io": "^4.5.4",
+    "ts-node": "^10.9.1"
+  }
+}
