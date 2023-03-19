@@ -4,7 +4,9 @@ import mongoose from 'mongoose';
 const messageRoutes = require('./routes/message')
 const healthRoutes = require('./routes/healthcheck')
 
-mongoose.connect(process.env.DATABASE_URL,
+console.log(process.env.DATABASE_URL_CHATAPP)
+
+mongoose.connect(process.env.DATABASE_URL_CHATAPP,
     { 
         connectTimeoutMS: 1000
     }

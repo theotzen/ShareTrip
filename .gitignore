@@ -6,6 +6,7 @@
 .idea/
 ./backend/venv/
 client/.env
+./.env
 .env
 shareTripChatApp/.env
 shareTripChatApp/db
