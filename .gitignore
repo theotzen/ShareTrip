@@ -7,8 +7,7 @@
 ./backend/venv/
 client/.env
 .env
-chatapp/venv/
-chatapp/.env
-chatapp/app/logs
-chatapp/db
+shareTripChatApp/.env
+shareTripChatApp/db
+shareTripChatApp/node_modules
 */__pycache__*
