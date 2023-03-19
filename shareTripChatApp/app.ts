@@ -3,8 +3,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 const messageRoutes = require('./routes/message')
 const healthRoutes = require('./routes/healthcheck')
-
-console.log(process.env.DATABASE_URL_CHATAPP)
+const logRequest = require('./middleware/logRequest')
 
 mongoose.connect(process.env.DATABASE_URL_CHATAPP,
     { 
@@ -18,12 +17,13 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+app.use(logRequest);
   
 
 //Origin, X-Requested-With, Content, Accept, Content-Type, Authorization
 //GET, POST, PUT, DELETE, PATCH, OPTIONS
 app.use((req, res, next) => {
-	// res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+	res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
 	res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
 	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
 	res.setHeader("Access-Control-Allow-Credentials", "true");
