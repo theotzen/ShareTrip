@@ -8,7 +8,7 @@ interface HealthcheckerResponse {
 
 export default function Aboutus() {
     const { data, error } = useSWR<HealthcheckerResponse>(
-        '/api/healthchecker',
+        'http://localhost:9000/api/beat',
         fetcher
     );
 

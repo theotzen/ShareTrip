@@ -1,6 +1,6 @@
 version: "3"
-services:
 
+services:
   client:
     build: 
       context: ./client
@@ -68,7 +68,7 @@ services:
   
   chatapp:
     build:
-      context: ./chatapp
+      context: ./shareTripChatApp
       dockerfile: Dockerfile
     env_file:
       - .env
@@ -79,16 +79,11 @@ services:
     networks:
       - chatapp-network
     volumes:
-      - ./chatapp:/app
+      - ./shareTripChatApp:/usr/app
     environment:
       - CLIENT=http://localhost:3000
     depends_on:
       - mongochatapp
-    command: bash -c "
-      uvicorn app.main:app 
-      --host 0.0.0.0 
-      --port 9000 
-      --reload"
 
   mongochatapp:
     image: mongo:latest
@@ -106,7 +101,7 @@ services:
     restart: always
     volumes:
       - mongochatapp:/data/db
-      - ./chatapp/db:/data/db:rw
+      - ./shareTripChatApp/db:/data/db:rw
     ports:
       - "27018:27017"
 
