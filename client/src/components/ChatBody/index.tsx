@@ -13,7 +13,7 @@ export default function ChatBody() {
 
     const messages = [
         {name: "totz", id: "adsffr3", text: "Bonjour"},
-        {name: "totz", id: "adsfwgr", text: "Bonjour"},
+        {name: "totz", id: "adsfwgr", text: "Bonjour comment ça va ? De mon côté tout va bien, pas à me plaindre. Je rentre actuellement de l'on-site à Chartres Zoo."},
         {name: "totz", id: "adsafgdf", text: "Bonjour"}
     ]
 

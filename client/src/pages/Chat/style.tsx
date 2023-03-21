@@ -29,16 +29,16 @@ export const chat_old = styled.div`
 `
 export const chat__sidebar = styled.div`
   height: 100%;
-  background-color: #ebb8ff;
-  flex: 0.2;
+  background-color: ${colors.backgroundLight};
+  width: 15%;
   padding-left: 20px;
 `
 export const chat__main = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
-  flex: 0.8;
-  background-color: #ebb8ff;
+  width: 85%;
+  background-color: ${colors.backgroundLight};
   align-items: center;
   justify-content: center;
 `
@@ -57,17 +57,18 @@ export const online__users = styled.div`
 `
 export const chat__mainHeader = styled.header`
   width: 95%;
-  height: 10%;
+  height: 6%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0px;
-  background-color: #ebb8ff;
+  background-color: ${colors.backgroundLight};
 `
 export const leaveChat__btn = styled.button`
   padding: 10px;
   width: 10%;
   margin-right: 15px;
+  border-radius: 6px;
   border: none;
   outline: none;
   background-color: #D1512D;
@@ -76,9 +77,9 @@ export const leaveChat__btn = styled.button`
 `
 export const message__container = styled.div`
     width: 95%;
-    height: 80%;
-    background-color: ${colors.backgroundLight};
-    border-radius: 30px;
+    height: 85%;
+    background-color: white;
+    border-radius: 6px;
     padding: 0px;
     overflow-y: scroll;
     margin-bottom: 0px;
@@ -87,9 +88,9 @@ export const message__container = styled.div`
 
 export const chat__footer = styled.div`
   padding: 0px;
-  background-color: #ebb8ff;
+  background-color: ${colors.backgroundLight};
   width: 95%;
-  height: 10%;
+  height: 9%;
 `
 export const chat__form = styled.form`
   width: 100%;
@@ -101,8 +102,8 @@ export const chat__form = styled.form`
 export const message = styled.input`
   width: 70%;
   height: 70%;
-  border-radius: 10px;
-  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: white;
   outline: none;
   padding: 0px;
   text-indent: 10px;
@@ -111,6 +112,7 @@ export const message = styled.input`
 export const sendBtn = styled.button`
   width: 10%;
   background-color: #9a41e8;
+  border-radius: 6px;
   padding: 10px;
   margin-right: 15px;
   border: none;
@@ -132,9 +134,10 @@ export const message__recipient = styled.div`
 `
 export const message__sender= styled.div`
     background-color: #9a41e8;
-    max-width: 300px;
+    width: fit-content;
+    max-width: 40%;
     padding: 10px;
-    padding-left: 20px;
+    padding-left: 10px;
     border-radius: 10px;
     margin-left: auto;
     margin-right: 10px;
@@ -147,7 +150,8 @@ export const message__chats = styled.div`
 `
 export const sender__name = styled.div`
   text-align: right;
-  margin-right: 300px;
+  margin-right: 15px;
+  font-size: 0.9vh;
 `
 export const message__status = styled.div`
   text-align: right;
