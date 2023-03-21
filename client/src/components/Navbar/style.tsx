@@ -10,7 +10,7 @@ export const NavContainer = styled.nav`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 7%;
+    height: 5%;
     background-color: ${colors.white};
 `;
 

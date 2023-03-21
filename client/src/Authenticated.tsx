@@ -9,6 +9,7 @@ import * as styles from './utils/Style/authenticatedStyle';
 
 import Error from './pages/Error';
 import Home from './pages/Home';
+import Chat from './pages/Chat'
 
 const Aboutus = React.lazy(() => import('./pages/Aboutus'));
 
@@ -23,6 +24,7 @@ export default function Authenticated() {
                         <Routes>
                             <Route path="/" element={<Home />} />
                             <Route path="/aboutus" element={<Aboutus />} />
+                            <Route path="/chat/:roomId" element={<Chat />} />
                             <Route path="*" element={<Error />} />
                         </Routes>
                     </styles.PageWrapper>
