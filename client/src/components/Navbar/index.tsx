@@ -31,7 +31,7 @@ export default function Navbar() {
             </styles.LeftDiv>
             <styles.MiddleDiv>
                 <Link to="/demo">Page 1</Link>
-                <Link to="/aboutus">Page 2</Link>
+                <Link to="/chat/main">Chat</Link>
                 <Link to="/aboutus">Page 3</Link>
                 <Link to="/aboutus">Page 4</Link>
             </styles.MiddleDiv>
