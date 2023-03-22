@@ -1,6 +1,7 @@
 import * as React from 'react';
 import useSWR from 'swr';
 import { useParams } from 'react-router-dom';
+import * as io from "socket.io-client";
 import { fetcher } from '../../api/api';
 
 import ChatBar from '../../components/ChatBar'
@@ -22,15 +23,19 @@ export default function Chat() {
     if (error) return <div>failed to load</div>;
     if (!data) return <div>loading...</div>;
 
+    console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥')
+
     const { roomId } = useParams();
+    const socket = io.connect('http://localhost:9000');
+
 
     return (
         <>
             <styles.chat>
-                <ChatBar/>
+                <ChatBar socket={socket}/>
                 <styles.chat__main>
-                    <ChatBody/>
-                    <ChatFooter/>
+                    <ChatBody socket={socket}/>
+                    <ChatFooter socket={socket}/>
                 </styles.chat__main>
             </styles.chat>
         </>

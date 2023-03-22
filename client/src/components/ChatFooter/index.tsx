@@ -3,23 +3,30 @@ import useSWR from 'swr';
 import { FormEvent, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetcher } from '../../api/api';
+import * as io from 'socket.io-client'
 
 import * as styles from '../../pages/Chat/style';
 
-interface HealthcheckerResponse {
-    message: string;
+interface IChaFooterProps {
+    socket: io.Socket;
 }
 
-export default function ChatFooter() {
+export default function ChatFooter(props: IChaFooterProps) {
 
+    const { socket } = props
     const [message, setMessage] = useState<string>("")
 
     const handleSendMessage = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-        if(message.trim()) {
-            console.log(message)
+        e.preventDefault();
+        if (message.trim()) {
+        socket.emit('message', {
+            text: message,
+            name: 'totz',
+            id: `${socket.id}${Math.random()}`,
+            socketID: socket.id,
+        });
         }
-        setMessage("")
+        setMessage('');
     }
 
     return (

@@ -2,15 +2,16 @@ import * as React from 'react';
 import useSWR from 'swr';
 import { useParams } from 'react-router-dom';
 import { fetcher } from '../../api/api';
-
+import * as io from "socket.io-client";
 import * as styles from '../../pages/Chat/style';
 
-interface HealthcheckerResponse {
-    message: string;
+interface IChatBarProps {
+    socket: io.Socket;
 }
 
-export default function ChatBar() {
+export default function ChatBar(props: IChatBarProps) {
 
+    const { socket } = props;
     return (
         <>
             <styles.chat__sidebar>

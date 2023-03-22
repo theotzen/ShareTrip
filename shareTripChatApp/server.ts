@@ -1,5 +1,7 @@
-const http = require('http');
+import http from 'http';
+import * as socket from "socket.io";
 const app_ = require('./app.ts');
+
 
 const normalizePort = val => {
   const port = parseInt(val, 10);
@@ -37,6 +39,24 @@ const errorHandler = error => {
 };
 
 const server = http.createServer(app_);
+
+const socketIO = new socket.Server(server, {
+  cors: {
+      origin: "http://localhost:3000"
+  }
+})
+
+socketIO.on('connection', (socket) => {
+  console.log(`⚡: ${socket.id} user just connected!`);
+
+  socket.on('message', (data) => {
+    socketIO.emit('messageResponse', data);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('🔥: A user disconnected');
+  });
+});
 
 server.on('error', errorHandler);
 server.on('listening', () => {
