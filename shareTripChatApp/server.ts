@@ -49,12 +49,18 @@ const socketIO = new socket.Server(server, {
 socketIO.on('connection', (socket) => {
   console.log(`⚡: ${socket.id} user just connected!`);
 
+  socket.on('newUser', (data) => {
+    console.log('new user will be added', data.userId)
+    // }
+})
+
   socket.on('message', (data) => {
     socketIO.emit('messageResponse', data);
   });
 
   socket.on('disconnect', () => {
     console.log('🔥: A user disconnected');
+    socket.disconnect();
   });
 });
 

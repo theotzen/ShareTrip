@@ -6,14 +6,18 @@ import { fetcher } from '../../api/api';
 import * as io from 'socket.io-client'
 
 import * as styles from '../../pages/Chat/style';
+import { UserResponseSchema } from '../../apiTypes';
+import { UserContextProps } from '../../utils/context';
 
 interface IChaFooterProps {
     socket: io.Socket;
+    user: UserResponseSchema;
+    room: string|undefined;
 }
 
 export default function ChatFooter(props: IChaFooterProps) {
 
-    const { socket } = props
+    const { socket, user, room } = props
     const [message, setMessage] = useState<string>("")
 
     const handleSendMessage = (e: FormEvent<HTMLFormElement>) => {
@@ -21,9 +25,11 @@ export default function ChatFooter(props: IChaFooterProps) {
         if (message.trim()) {
         socket.emit('message', {
             text: message,
-            name: 'totz',
+            name: user.name,
+            userId: user.id,
             id: `${socket.id}${Math.random()}`,
             socketID: socket.id,
+            room: room
         });
         }
         setMessage('');
