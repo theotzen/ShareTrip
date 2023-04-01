@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import UserManager from './utils/context';
+import UserManager from './utils/context/UserContext';
+import SocketContextComponent from './utils/context/SocketContextComponent'
 
 import Authenticated from './Authenticated';
 import Spinner from './components/Spinner';
@@ -27,7 +28,9 @@ function App() {
 
     return (
         <UserManager user={user.user}>
-            <Authenticated />
+            <SocketContextComponent>
+                <Authenticated />
+            </SocketContextComponent>
         </UserManager>
     );
 }

@@ -11,7 +11,7 @@ import * as styles from './utils/Style/authenticatedStyle';
 import Error from './pages/Error';
 import Home from './pages/Home';
 import Chat from './pages/Chat'
-import { UserContext } from './utils/context';
+import { UserContext } from './utils/context/UserContext';
 
 const Aboutus = React.lazy(() => import('./pages/Aboutus'));
 
@@ -20,16 +20,6 @@ let socket: Socket;
 export default function Authenticated() {
 
     const user = React.useContext(UserContext)
-
-    React.useEffect(() => {
-        socket = io('http://localhost:9000')
-
-        socket.emit('newUser', {userId: user.user!.id, socketId: socket.id})
-
-        return () => {
-            socket.close()
-          }
-    }, [])
 
     return (
         <BrowserRouter>
@@ -41,7 +31,7 @@ export default function Authenticated() {
                         <Routes>
                             <Route path="/" element={<Home />} />
                             <Route path="/aboutus" element={<Aboutus />} />
-                            <Route path="/chat/:roomId" element={<Chat socket={ socket }/>} />
+                            <Route path="/chat/:roomId" element={<Chat />} />
                             <Route path="*" element={<Error />} />
                         </Routes>
                     </styles.PageWrapper>

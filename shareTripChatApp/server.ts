@@ -1,5 +1,7 @@
 import http from 'http';
+import { SocketAddress } from 'net';
 import * as socket from "socket.io";
+import { ServerSocket } from './controllers/socket';
 const app_ = require('./app.ts');
 
 
@@ -40,29 +42,7 @@ const errorHandler = error => {
 
 const server = http.createServer(app_);
 
-const socketIO = new socket.Server(server, {
-  cors: {
-      origin: "http://localhost:3000"
-  }
-})
-
-socketIO.on('connection', (socket) => {
-  console.log(`⚡: ${socket.id} user just connected!`);
-
-  socket.on('newUser', (data) => {
-    console.log('new user will be added', data.userId)
-    // }
-})
-
-  socket.on('message', (data) => {
-    socketIO.emit('messageResponse', data);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('🔥: A user disconnected');
-    socket.disconnect();
-  });
-});
+new ServerSocket(server);
 
 server.on('error', errorHandler);
 server.on('listening', () => {
