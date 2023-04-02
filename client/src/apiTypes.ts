@@ -30,3 +30,11 @@ export interface UserResponseSchema {
   updated_at?: string;
   id: string;
 }
+export interface Message {
+  text: string,
+  name: string,
+  userId: string,
+  id: string,
+  socketID: string,
+  room: string
+}

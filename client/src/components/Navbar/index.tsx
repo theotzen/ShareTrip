@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSWRConfig } from 'swr';
-import { UserContext } from '../../utils/context';
+import { UserContext } from '../../utils/context/UserContext';
 import { PrecButton } from '../../utils/Style/globalStyles';
 import * as styles from './style';
 

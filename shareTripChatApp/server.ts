@@ -1,5 +1,9 @@
-const http = require('http');
+import http from 'http';
+import { SocketAddress } from 'net';
+import * as socket from "socket.io";
+import { ServerSocket } from './controllers/socket';
 const app_ = require('./app.ts');
+
 
 const normalizePort = val => {
   const port = parseInt(val, 10);
@@ -37,6 +41,8 @@ const errorHandler = error => {
 };
 
 const server = http.createServer(app_);
+
+new ServerSocket(server);
 
 server.on('error', errorHandler);
 server.on('listening', () => {

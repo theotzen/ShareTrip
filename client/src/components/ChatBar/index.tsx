@@ -2,14 +2,20 @@ import * as React from 'react';
 import useSWR from 'swr';
 import { useParams } from 'react-router-dom';
 import { fetcher } from '../../api/api';
-
+import * as io from "socket.io-client";
 import * as styles from '../../pages/Chat/style';
 
-interface HealthcheckerResponse {
-    message: string;
+interface IChatBarProps {
+    socket: io.Socket;
+    users: string[];
 }
 
-export default function ChatBar() {
+export default function ChatBar(props: IChatBarProps) {
+
+    const { socket, users } = props;
+
+    console.info('from chat bar socket ', socket.id);
+    console.info('from chat bar user ', users);
 
     return (
         <>
@@ -20,9 +26,13 @@ export default function ChatBar() {
                         Active users
                     </styles.chat__header>
                     <styles.chat__users>
-                        <p>USER 1</p>
-                        <p>USER 2</p>
-                        <p>USER 3</p>
+                        {users
+                        ?
+                            users.map((userId, i) => {
+                                return <p key={i}>{userId}</p>
+                            })
+                        :
+                        <p>No user connected</p>}
                     </styles.chat__users>
                 </div>
             </styles.chat__sidebar>

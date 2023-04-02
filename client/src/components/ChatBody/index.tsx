@@ -2,37 +2,52 @@ import * as React from 'react';
 import useSWR from 'swr';
 import { useParams } from 'react-router-dom';
 import { fetcher } from '../../api/api';
+import * as io from 'socket.io-client'
 
 import * as styles from '../../pages/Chat/style';
+import { UserResponseSchema } from '../../apiTypes';
+import { Message } from '../../apiTypes';
 
-interface HealthcheckerResponse {
-    message: string;
+interface IChatBodyProps {
+    socket: io.Socket;
+    user: UserResponseSchema;
+    room: string|undefined;
+    messages: Message[];
 }
 
-export default function ChatBody() {
+export default function ChatBody(props: IChatBodyProps) {
 
-    const messages = [
-        {name: "totz", id: "adsffr3", text: "Bonjour"},
-        {name: "totz", id: "adsfwgr", text: "Bonjour comment ça va ? De mon côté tout va bien, pas à me plaindre. Je rentre actuellement de l'on-site à Chartres Zoo."},
-        {name: "totz", id: "adsafgdf", text: "Bonjour"}
-    ]
+    const { socket, user, room, messages } = props
 
     return (
         <>
             <styles.chat__mainHeader>
                 <p>Chilling</p>
-                <styles.leaveChat__btn>LEAVE CHAT</styles.leaveChat__btn>
+                <styles.leaveChat__btn>LEAVE</styles.leaveChat__btn>
             </styles.chat__mainHeader>
 
             <styles.message__container>
                 {
-                    messages.map( (message) => (
+                    messages.map( (message, i) => (
+                        message.userId === user.id ?
                         <>
-                            <styles.message__chats key={message.id}>
+                            <styles.message__chats key={i}>
                                 <styles.sender__name>{message.name}</styles.sender__name>
                                 <styles.message__sender>
                                     {message.text}
                                 </styles.message__sender>
+                            </styles.message__chats>
+                            {/* <styles.message__status>
+                                Sent
+                            </styles.message__status> */}
+                        </> 
+                        :
+                        <>
+                            <styles.message__chats key={i}>
+                                <styles.sender__name_for_recipient>{message.name}</styles.sender__name_for_recipient>
+                                <styles.message__recipient>
+                                    {message.text}
+                                </styles.message__recipient>
                             </styles.message__chats>
                             {/* <styles.message__status>
                                 Sent

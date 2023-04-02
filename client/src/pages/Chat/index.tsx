@@ -1,36 +1,54 @@
 import * as React from 'react';
-import useSWR from 'swr';
 import { useParams } from 'react-router-dom';
-import { fetcher } from '../../api/api';
 
 import ChatBar from '../../components/ChatBar'
 import ChatFooter from '../../components/ChatFooter'
 import ChatBody from '../../components/ChatBody'
+import { UserContext } from '../../utils/context/UserContext';
+import SocketContext from '../../utils/context/SocketContext';
 
 import * as styles from './style';
+import Error from '../Error';
+import { Message } from '../../apiTypes';
+import Spinner from '../../components/Spinner';
 
-interface HealthcheckerResponse {
-    message: string;
-}
 
-export default function Chat() {
-    const { data, error } = useSWR<HealthcheckerResponse>(
-        'http://localhost:9000/api/beat',
-        fetcher
-    );
+interface IChatProps {}
 
-    if (error) return <div>failed to load</div>;
-    if (!data) return <div>loading...</div>;
+export default function Chat(props: IChatProps) {
+    
+    const user = React.useContext(UserContext)
+    const { socket, users } = React.useContext(SocketContext).SocketState
 
     const { roomId } = useParams();
 
+    if (socket === undefined ){
+        return <Spinner />
+    }
+
+    console.log('⚡', socket.id)
+
+    const [messages, setMessages] = React.useState<Message[]>([]);
+
+    React.useEffect(() => {
+        socket.on('message', (data) => {
+            console.log('From the user page : ', data)
+            setMessages([...messages, data])});
+    }, [socket, messages]);
+
+    if (user.user === undefined) {
+        return (
+            <Error />
+        )
+    }
+    
     return (
         <>
             <styles.chat>
-                <ChatBar/>
+                <ChatBar socket={socket} users={users}/>
                 <styles.chat__main>
-                    <ChatBody/>
-                    <ChatFooter/>
+                    <ChatBody socket={socket} user={user.user} room={roomId} messages={messages}/>
+                    <ChatFooter socket={socket} user={user.user} room={roomId}/>
                 </styles.chat__main>
             </styles.chat>
         </>
