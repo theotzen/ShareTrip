@@ -34,7 +34,14 @@ export interface Message {
   text: string,
   name: string,
   userId: string,
-  id: string,
-  socketID: string,
-  room: string
+  _id: string,
+  roomId: string,
+  dateSent: Date
+}
+export interface Room {
+  name: string,
+  users: string[],
+  _id: string,
+  dateCreated: Date,
+  dateUpdated: Date
 }

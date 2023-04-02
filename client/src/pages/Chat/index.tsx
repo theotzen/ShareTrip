@@ -9,8 +9,9 @@ import SocketContext from '../../utils/context/SocketContext';
 
 import * as styles from './style';
 import Error from '../Error';
-import { Message } from '../../apiTypes';
+import { Message, Room } from '../../apiTypes';
 import Spinner from '../../components/Spinner';
+import axios from 'axios';
 
 
 interface IChatProps {}
@@ -39,6 +40,7 @@ export default function Chat(props: IChatProps) {
         });
     }, []);
 
+
     React.useEffect(() => {
         socket.on('message', (data) => {
             console.log('From the user page : ', data)
@@ -54,7 +56,7 @@ export default function Chat(props: IChatProps) {
     return (
         <>
             <styles.chat>
-                <ChatBar socket={socket} users={users}/>
+                <ChatBar socket={socket} roomId={roomId!} user={user.user}/>
                 <styles.chat__main>
                     <ChatBody socket={socket} user={user.user} room={roomId} messages={messages}/>
                     <ChatFooter socket={socket} user={user.user} room={roomId}/>

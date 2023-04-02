@@ -7,9 +7,10 @@ const messageSchema = new Schema({
     // messageId: { type: String, required: true, default: () => {
     //      return uuid();
     //  }},
+    name: { type: String, required: true },
     userId: { type: String, required: true },
     roomId: { type: String, required: true },
-    content: { type: String, required: true },
+    text: { type: String, required: true },
     dateSent: { type: Date, default: Date.now }
 })
 
