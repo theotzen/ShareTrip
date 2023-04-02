@@ -1,6 +1,8 @@
 import { Server as HttpServer } from 'http';
 import { Socket, Server } from 'socket.io';
 import express from 'express';
+const AppError = require('../errors/AppError');
+const roomController = require('../controllers/room')
 
 export class ServerSocket {
     public static instance: ServerSocket;
@@ -26,7 +28,7 @@ export class ServerSocket {
     StartListeners = (socket: Socket) => {
         console.info('Message from socket ' + socket.id);
 
-        socket.on('handshake', (userId: string, callback: (id: string, users: string[]) => void) => {
+        socket.on('handshake', (userId: string, callback: (userId: string, users: string[]) => void) => {
             console.info('Handshake from socket ' + socket.id);
 
             console.info('Message coming from user : ' + userId);
@@ -55,6 +57,20 @@ export class ServerSocket {
         socket.on('message', (message) => {
             console.info('New messager received from user : ' + message.userId + ' with content : ' + message.text);
             this.io.emit('message', {...message});
+        })
+
+        socket.on('join', (data, callback: (message: string) => void) => {
+            if (data.roomId === 'main') {
+                console.error('Can not join room : ' + data.roomId);
+                callback('Nobody can join room : ' + data.roomId);
+                return;
+            }
+            if (roomController.checkIfUserIsInRoom(data.roomId, data.userId)) {
+                socket.join(data.roomId);
+                callback('Joined room : ' + data.roomId);
+            }
+            console.error('Can not join room : ' + data.roomId);
+            callback('Can not join room : ' + data.roomId);
         })
 
         socket.on('disconnect', () => {

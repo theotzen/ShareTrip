@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 const messageRoutes = require('./routes/message')
 const healthRoutes = require('./routes/healthcheck')
 const socketRoutes = require('./routes/socket')
+const roomRoutes = require('./routes/room')
 const logRequest = require('./middleware/logRequest')
 
 mongoose.connect(process.env.DATABASE_URL_CHATAPP,
@@ -33,6 +34,7 @@ app.use((req, res, next) => {
 
 app.use('/api', healthRoutes);
 app.use('/api/message', messageRoutes);
-app.use('api/socket/', socketRoutes);
+app.use('/api/socket', socketRoutes);
+app.use('/api/room', roomRoutes);
 
 module.exports = app;

@@ -17,7 +17,7 @@ interface IChatProps {}
 
 export default function Chat(props: IChatProps) {
     
-    const user = React.useContext(UserContext)
+    const user = React.useContext(UserContext);
     const { socket, users } = React.useContext(SocketContext).SocketState
 
     const { roomId } = useParams();
@@ -29,6 +29,15 @@ export default function Chat(props: IChatProps) {
     console.log('⚡', socket.id)
 
     const [messages, setMessages] = React.useState<Message[]>([]);
+
+    React.useEffect(() => {
+        socket.emit('join', {
+            roomId: roomId,
+            userId: user.user!.id
+        }, async (message: string) => {
+            console.info(message)
+        });
+    }, []);
 
     React.useEffect(() => {
         socket.on('message', (data) => {

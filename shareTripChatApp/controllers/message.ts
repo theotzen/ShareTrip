@@ -22,7 +22,7 @@ exports.getMessageById = async (req: express.Request,
         res: express.Response) => {
     try {
         const message = await Message.findOne({
-            _id: req.param.id
+            _id: req.params.id
         })
         res.status(200).json(message);
     }
@@ -36,7 +36,7 @@ exports.getMessagesByUserId = async (req: express.Request,
         res: express.Response) => {
     try {
         const message = await Message.find({
-            userId: req.param.userId
+            userId: req.params.userId
         })
         res.status(200).json(message);
     }
@@ -46,15 +46,15 @@ exports.getMessagesByUserId = async (req: express.Request,
 }
 
 
-exports.getMessagesBySocketId = async (req: express.Request,
+exports.getMessagesByRoomId = async (req: express.Request,
     res: express.Response) => {
-try {
-    const message = await Message.find({
-        socketId: req.param.socketId
-    })
-    res.status(200).json(message);
-}
-catch (err) {
-    new AppError(err.message, err.code);
-}
+    try {
+        const message = await Message.find({
+            roomId: req.params.roomId
+        })
+        res.status(200).json(message);
+    }
+    catch (err) {
+        new AppError(err.message, err.code);
+    }
 }
