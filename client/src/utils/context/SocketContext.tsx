@@ -1,15 +1,15 @@
+import React from "react";
 import { createContext } from "react";
 import { Socket } from 'socket.io-client';
+import UserContext from "./UserContext";
 
 export interface ISocketContextState {
     socket: Socket | undefined;
-    userId: string;
     users: string[];
 };
 
 export const defaultSocketContextState: ISocketContextState = {
     socket: undefined,
-    userId: '',
     users: []
 };
 
@@ -28,8 +28,6 @@ export const SocketReducer = (state: ISocketContextState, action: ISocketContext
     switch (action.type) {
         case 'update_socket':
             return { ...state, socket: action.payload as Socket };
-        case 'update_uid':
-            return { ...state, uid: action.payload as string };
         case 'update_users':
             return { ...state, users: action.payload as string[] };
         case 'remove_user':

@@ -126,11 +126,17 @@ export const sendBtn = styled.button`
 `
 
 export const message__recipient = styled.div`
-    background-color: #9a41e8;
-    width: 300px;
+    background-color: ${colors.backgroundLight};
+    width: fit-content;
+    max-width: 40%;
     padding: 10px;
+    padding-right: 10px;
     border-radius: 10px;
+    margin-right: auto;
+    margin-left: 10px;
+    margin-bottom: 5px;
     font-size: 15px;
+    color: black;
 `
 export const message__sender= styled.div`
     background-color: #9a41e8;
@@ -153,6 +159,13 @@ export const sender__name = styled.div`
   margin-right: 15px;
   font-size: 0.9vh;
 `
+
+export const sender__name_for_recipient = styled.div`
+  text-align: left;
+  margin-left: 15px;
+  font-size: 0.9vh;
+`
+
 export const message__status = styled.div`
   text-align: right;
   font-size: 10px;

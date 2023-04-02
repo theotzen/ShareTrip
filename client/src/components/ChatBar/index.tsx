@@ -7,11 +7,16 @@ import * as styles from '../../pages/Chat/style';
 
 interface IChatBarProps {
     socket: io.Socket;
+    users: string[];
 }
 
 export default function ChatBar(props: IChatBarProps) {
 
-    const { socket } = props;
+    const { socket, users } = props;
+
+    console.info('from chat bar socket ', socket.id);
+    console.info('from chat bar user ', users);
+
     return (
         <>
             <styles.chat__sidebar>
@@ -21,9 +26,13 @@ export default function ChatBar(props: IChatBarProps) {
                         Active users
                     </styles.chat__header>
                     <styles.chat__users>
-                        <p>USER 1</p>
-                        <p>USER 2</p>
-                        <p>USER 3</p>
+                        {users
+                        ?
+                            users.map((userId, i) => {
+                                return <p key={i}>{userId}</p>
+                            })
+                        :
+                        <p>No user connected</p>}
                     </styles.chat__users>
                 </div>
             </styles.chat__sidebar>

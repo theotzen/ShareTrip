@@ -1,17 +1,21 @@
 import React, { PropsWithChildren, useEffect, useReducer, useState } from 'react';
 import { useSocket } from '../../hooks/useSocket';
 import { defaultSocketContextState, SocketContextProvider, SocketReducer } from './SocketContext';
+import { UserContext } from './UserContext';
 
 export interface ISocketContextComponentProps extends PropsWithChildren {};
 
 const SocketContextComponent: React.FC<ISocketContextComponentProps> = (props) => { 
     const { children } = props;
 
+    const user = React.useContext(UserContext).user!;
+
     const socket = useSocket('http://localhost:9000', {
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
         autoConnect: false
-    });
+        }
+    );
 
     const [SocketState, SocketDispatch] = useReducer(SocketReducer, defaultSocketContextState);
     const [loading, setLoading] = useState<boolean>(true);
@@ -59,10 +63,10 @@ const SocketContextComponent: React.FC<ISocketContextComponentProps> = (props) =
     const SendHandshake = async () => {
         console.info('Sending handshake to server ...');
 
-        socket.emit('handshake', async (userId: string, users: string[]) => {
-            console.info('User handshake callback message received');
+        socket.emit('handshake', user.id, async (userId: string, users: string[]) => {
+            console.info('User handshake callback message received from user : ' + userId);
+            console.info('users received after handshake : ' + users)
             SocketDispatch({ type: 'update_users', payload: users });
-            SocketDispatch({ type: 'update_uid', payload: userId });
         });
 
         setLoading(false);

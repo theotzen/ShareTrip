@@ -18,11 +18,6 @@ interface IChatBodyProps {
 export default function ChatBody(props: IChatBodyProps) {
 
     const { socket, user, room, messages } = props
-    const messagesFake = [
-        {name: "totz", key: "adsffr3", text: "Bonjour"},
-        {name: "totz", key: "adsfwgr", text: "Bonjour comment ça va ? De mon côté tout va bien, pas à me plaindre. Je rentre actuellement de l'on-site à Chartres Zoo."},
-        {name: "totz", key: "adsafgdf", text: "Bonjour"}
-    ]
 
     return (
         <>
@@ -33,10 +28,10 @@ export default function ChatBody(props: IChatBodyProps) {
 
             <styles.message__container>
                 {
-                    messages.map( (message) => (
+                    messages.map( (message, i) => (
                         message.userId === user.id ?
                         <>
-                            <styles.message__chats key={message.id}>
+                            <styles.message__chats key={i}>
                                 <styles.sender__name>{message.name}</styles.sender__name>
                                 <styles.message__sender>
                                     {message.text}
@@ -48,8 +43,8 @@ export default function ChatBody(props: IChatBodyProps) {
                         </> 
                         :
                         <>
-                            <styles.message__chats key={message.id}>
-                                <styles.sender__name>{message.name}</styles.sender__name>
+                            <styles.message__chats key={i}>
+                                <styles.sender__name_for_recipient>{message.name}</styles.sender__name_for_recipient>
                                 <styles.message__recipient>
                                     {message.text}
                                 </styles.message__recipient>

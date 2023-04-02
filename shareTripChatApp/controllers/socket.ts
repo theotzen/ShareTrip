@@ -24,16 +24,18 @@ export class ServerSocket {
     }
 
     StartListeners = (socket: Socket) => {
-        console.info('Message from ' + socket.id);
+        console.info('Message from socket ' + socket.id);
 
-        socket.on('handshake', (callback: (id: string, users: string[]) => void) => {
-            console.info('Handshake from' + socket.id);
+        socket.on('handshake', (userId: string, callback: (id: string, users: string[]) => void) => {
+            console.info('Handshake from socket ' + socket.id);
+
+            console.info('Message coming from user : ' + userId);
 
             const reconnected = Object.values(this.users).includes(socket.id);
 
             if (reconnected) {
-                console.info(`User ${socket.data.userId} has reconnected`);
-                const userId = this.GetUserIDFromSocketId(socket.id);
+                console.info(`User ${userId} has reconnected`);
+                // const userId = this.GetUserIDFromSocketId(socket.id);
                 const users = Object.values(this.users)
 
                 if (userId) {
@@ -43,11 +45,16 @@ export class ServerSocket {
                 }
             }
 
-            this.users[socket.data.userId] = socket.id;
+            this.users[userId] = socket.id;
 
-            const users = Object.values(this.users);
-            console.info('Sending callback');
-            callback(socket.data.userId, users);
+            const users = Object.keys(this.users);
+            console.info('Sending callback with users : ' + users);
+            callback(userId, users);
+        });
+
+        socket.on('message', (message) => {
+            console.info('New messager received from user : ' + message.userId + ' with content : ' + message.text);
+            this.io.emit('message', {...message});
         })
 
         socket.on('disconnect', () => {

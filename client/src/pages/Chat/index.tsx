@@ -18,21 +18,23 @@ interface IChatProps {}
 export default function Chat(props: IChatProps) {
     
     const user = React.useContext(UserContext)
-    const { socket, userId, users } = React.useContext(SocketContext).SocketState
+    const { socket, users } = React.useContext(SocketContext).SocketState
 
     const { roomId } = useParams();
 
     if (socket === undefined ){
         return <Spinner />
     }
-    
+
     console.log('⚡', socket.id)
 
     const [messages, setMessages] = React.useState<Message[]>([]);
 
     React.useEffect(() => {
-        socket.on('messageResponse', (data) => setMessages((prev) => [...prev, data]));
-    }, [messages]);
+        socket.on('message', (data) => {
+            console.log('From the user page : ', data)
+            setMessages([...messages, data])});
+    }, [socket, messages]);
 
     if (user.user === undefined) {
         return (
@@ -43,7 +45,7 @@ export default function Chat(props: IChatProps) {
     return (
         <>
             <styles.chat>
-                <ChatBar socket={socket}/>
+                <ChatBar socket={socket} users={users}/>
                 <styles.chat__main>
                     <ChatBody socket={socket} user={user.user} room={roomId} messages={messages}/>
                     <ChatFooter socket={socket} user={user.user} room={roomId}/>

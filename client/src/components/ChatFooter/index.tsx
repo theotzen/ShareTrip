@@ -7,7 +7,7 @@ import * as io from 'socket.io-client'
 
 import * as styles from '../../pages/Chat/style';
 import { UserResponseSchema } from '../../apiTypes';
-import { UserContextProps } from '../../utils/context/UserContext';
+
 
 interface IChaFooterProps {
     socket: io.Socket;
