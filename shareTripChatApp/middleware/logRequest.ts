@@ -1,4 +1,4 @@
-import { express, Request, Response, NextFunction } from 'express'
+import { Request, Response, NextFunction } from 'express'
 
 module.exports = (req: Request, res: Response, next: NextFunction) => {
     res.on('finish', () => {

@@ -1,6 +1,7 @@
 require("dotenv").config();
 import express from 'express';
 import mongoose from 'mongoose';
+const cookieParser = require('cookie-parser');
 const messageRoutes = require('./routes/message')
 const healthRoutes = require('./routes/healthcheck')
 const socketRoutes = require('./routes/socket')
@@ -13,10 +14,11 @@ mongoose.connect(process.env.DATABASE_URL_CHATAPP,
     }
     )
     .then(() => console.log('Connection to MongoDB succeeded !'))
-    .catch((err) => console.log('Connection to MongoDB failed !', err));
+    .catch((err) => console.log('Connection to MongoDB failed !', err.message));
 
 const app = express();
 
+app.use(cookieParser(`${process.env.JWT_PRIVATE_KEY}`));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(logRequest);
