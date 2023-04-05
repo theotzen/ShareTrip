@@ -17,6 +17,17 @@ exports.createMessage = async (req: TypedRequestBody<MessagePayload>,
     }
 }
 
+exports.persistMessageInDatabase = async (messageToSave: MessagePayload) => {
+    try {
+        const message = new Message(messageToSave)
+        const result = await message.save();
+        return {result}
+    }
+    catch (err) {
+        new AppError(err.message, err.code);
+    }
+}
+
 
 exports.getMessageById = async (req: express.Request,
         res: express.Response) => {

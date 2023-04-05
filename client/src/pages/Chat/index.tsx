@@ -28,6 +28,7 @@ export default function Chat(props: IChatProps) {
     }
 
     console.log('⚡', socket.id)
+    console.log('⚡⚡⚡⚡', roomId)
 
     const [messages, setMessages] = React.useState<Message[]>([]);
     const [loading, setLoading] = React.useState<Boolean>(false);
@@ -49,7 +50,7 @@ export default function Chat(props: IChatProps) {
           try {
             const response = await axios.get(`http://localhost:9000/api/message/getMessagesByRoomId/${roomId}`);
             console.info(`Messages gotten from chat for room ${roomId}`, response.data.result);
-            setMessages((prev) => [...prev, ...response.data.result]);
+            setMessages((prev) => [...response.data.result]);
           } catch (err: any) {
             console.error(err.message);
           }
@@ -64,8 +65,6 @@ export default function Chat(props: IChatProps) {
             console.log('From the user page : ', data)
             setMessages([...messages, data])});
     }, [socket, messages]);
-
-    console.info('from the chat page ', messages)
 
     if (user.user === undefined) {
         return (

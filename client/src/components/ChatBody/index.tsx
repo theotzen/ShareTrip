@@ -19,8 +19,6 @@ export default function ChatBody(props: IChatBodyProps) {
 
     const { socket, user, room, messages } = props
 
-    console.info('Received messages in chat body : ' + messages);
-
     return (
         <>
             <styles.chat__mainHeader>
@@ -33,7 +31,7 @@ export default function ChatBody(props: IChatBodyProps) {
                     messages.map( (message, i) => (
                         message.userId === user.id ?
                         <>
-                            <styles.message__chats key={i}>
+                            <styles.message__chats key={`${i}${message._id}`}>
                                 <styles.sender__name>{message.name}</styles.sender__name>
                                 <styles.message__sender>
                                     {message.text}
@@ -45,7 +43,7 @@ export default function ChatBody(props: IChatBodyProps) {
                         </> 
                         :
                         <>
-                            <styles.message__chats key={i}>
+                            <styles.message__chats key={`${i}${message._id}`}>
                                 <styles.sender__name_for_recipient>{message.name}</styles.sender__name_for_recipient>
                                 <styles.message__recipient>
                                     {message.text}

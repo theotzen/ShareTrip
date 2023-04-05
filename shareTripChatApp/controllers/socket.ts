@@ -3,15 +3,18 @@ import { Socket, Server } from 'socket.io';
 import express from 'express';
 const AppError = require('../errors/AppError');
 const roomController = require('../controllers/room')
+const messageController = require('../controllers/message')
 
 export class ServerSocket {
     public static instance: ServerSocket;
     public io: Server;
     public users: { [id: string]: string };
+    public rooms: {[id: string]: string[]}
 
     constructor(server: HttpServer) {
         ServerSocket.instance = this;
         this.users = {};
+        this.rooms = {};
         this.io = new Server(server, {
             serveClient: false,
             pingInterval: 10000,
@@ -54,9 +57,14 @@ export class ServerSocket {
             callback(userId, users);
         });
 
-        socket.on('message', (message) => {
-            console.info('New messager received from user : ' + message.userId + ' with content : ' + message.text);
-            this.io.emit('message', {...message});
+        socket.on('message', async (message) => {
+            try {
+                console.info('New message received from user : ' + message.userId + ' with content : ' + message.text);
+                const result = await messageController.persistMessageInDatabase(message);
+                this.io.emit('message', {...message});
+            } catch (err: any) {
+                console.error(err.message);
+            }
         })
 
         socket.on('join', (data, callback: (message: string) => void) => {
@@ -66,7 +74,9 @@ export class ServerSocket {
                 return;
             }
             if (roomController.checkIfUserIsInRoom(data.roomId, data.userId)) {
+                this.rooms[data.roomId] = this.rooms[data.roomId] ? [...this.rooms[data.roomId], data.userId] : [data.userId];
                 socket.join(data.roomId);
+                console.info('joined room : ' + data.roomId)
                 callback('Joined room : ' + data.roomId);
             }
             console.error('Can not join room : ' + data.roomId);
