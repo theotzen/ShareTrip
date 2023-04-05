@@ -34,9 +34,9 @@ export interface Message {
   text: string,
   name: string,
   userId: string,
-  _id: string,
+  _id?: string,
   roomId: string,
-  dateSent: Date
+  dateSent?: Date
 }
 export interface Room {
   name: string,

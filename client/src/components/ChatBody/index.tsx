@@ -19,6 +19,8 @@ export default function ChatBody(props: IChatBodyProps) {
 
     const { socket, user, room, messages } = props
 
+    console.info('Received messages in chat body : ' + messages);
+
     return (
         <>
             <styles.chat__mainHeader>

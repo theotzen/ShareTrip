@@ -30,6 +30,8 @@ export default function Chat(props: IChatProps) {
     console.log('⚡', socket.id)
 
     const [messages, setMessages] = React.useState<Message[]>([]);
+    const [loading, setLoading] = React.useState<Boolean>(false);
+
 
     React.useEffect(() => {
         socket.emit('join', {
@@ -42,10 +44,28 @@ export default function Chat(props: IChatProps) {
 
 
     React.useEffect(() => {
+        const fetchData = async () =>{
+          setLoading(true);
+          try {
+            const response = await axios.get(`http://localhost:9000/api/message/getMessagesByRoomId/${roomId}`);
+            console.info(`Messages gotten from chat for room ${roomId}`, response.data.result);
+            setMessages((prev) => [...prev, ...response.data.result]);
+          } catch (err: any) {
+            console.error(err.message);
+          }
+          setLoading(false);
+        }
+        fetchData();
+      }, [roomId]);
+
+
+    React.useEffect(() => {
         socket.on('message', (data) => {
             console.log('From the user page : ', data)
             setMessages([...messages, data])});
     }, [socket, messages]);
+
+    console.info('from the chat page ', messages)
 
     if (user.user === undefined) {
         return (
