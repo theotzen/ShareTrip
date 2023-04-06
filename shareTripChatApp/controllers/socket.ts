@@ -57,30 +57,37 @@ export class ServerSocket {
             callback(userId, users);
         });
 
-        socket.on('message', async (message) => {
-            try {
-                console.info('New message received from user : ' + message.userId + ' with content : ' + message.text);
-                const result = await messageController.persistMessageInDatabase(message);
-                this.io.emit('message', {...message});
-            } catch (err: any) {
-                console.error(err.message);
-            }
-        })
-
+        
         socket.on('join', (data, callback: (message: string) => void) => {
             if (data.roomId === 'main') {
-                console.error('Can not join room : ' + data.roomId);
-                callback('Nobody can join room : ' + data.roomId);
+                console.error(data.userId + ' can not join room : main');
+                callback('Nobody can join room : main');
                 return;
             }
             if (roomController.checkIfUserIsInRoom(data.roomId, data.userId)) {
                 this.rooms[data.roomId] = this.rooms[data.roomId] ? [...this.rooms[data.roomId], data.userId] : [data.userId];
                 socket.join(data.roomId);
-                console.info('joined room : ' + data.roomId)
+                console.info(data.userId + ' joined room : ' + data.roomId)
                 callback('Joined room : ' + data.roomId);
             }
-            console.error('Can not join room : ' + data.roomId);
+            console.error(data.userId + ' can not join room : ' + data.roomId);
             callback('Can not join room : ' + data.roomId);
+        })
+        
+        socket.on('typing', (data) => {
+            socket.to(data.roomId).emit('typingResponse', data.userId)
+        });
+        
+        socket.on('message', async (message) => {
+            try {
+                console.info(`Here are the current users in room ${message.roomId} : ` + this.rooms[message.roomId]);
+                console.info('New message received from user : ' + message.userId + ' with content : ' + message.text);
+                const result = await messageController.persistMessageInDatabase(message);
+                console.info('sending message to room : ' + message.roomId);
+                this.io.to(message.roomId).emit('message', {...message});
+            } catch (err: any) {
+                console.error(err.message);
+            }
         })
 
         socket.on('disconnect', () => {

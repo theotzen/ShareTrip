@@ -13,11 +13,12 @@ interface IChatBodyProps {
     user: UserResponseSchema;
     room: string|undefined;
     messages: Message[];
+    lastMessageRef: React.Ref<HTMLDivElement>;
 }
 
 export default function ChatBody(props: IChatBodyProps) {
 
-    const { socket, user, room, messages } = props
+    const { socket, user, room, messages, lastMessageRef } = props
 
     return (
         <>
@@ -56,6 +57,7 @@ export default function ChatBody(props: IChatBodyProps) {
                         )
                     )
                 }
+                <div ref={lastMessageRef} />
             </styles.message__container>
         </>
     );

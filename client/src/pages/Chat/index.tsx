@@ -31,7 +31,9 @@ export default function Chat(props: IChatProps) {
     console.log('⚡⚡⚡⚡', roomId)
 
     const [messages, setMessages] = React.useState<Message[]>([]);
-    const [loading, setLoading] = React.useState<Boolean>(false);
+    const [loading, setLoading] = React.useState<boolean>(false);
+    // const [typingStatus, setTypingStatus] = React.useState<string>('');
+    const lastMessageRef = React.useRef<null | HTMLDivElement>(null);
 
 
     React.useEffect(() => {
@@ -48,7 +50,10 @@ export default function Chat(props: IChatProps) {
         const fetchData = async () =>{
           setLoading(true);
           try {
-            const response = await axios.get(`http://localhost:9000/api/message/getMessagesByRoomId/${roomId}`);
+            const response = await axios.get(
+                    `http://localhost:9000/api/message/getMessagesByRoomId/${roomId}`,
+                    { withCredentials: true }
+                );
             console.info(`Messages gotten from chat for room ${roomId}`, response.data.result);
             setMessages((prev) => [...response.data.result]);
           } catch (err: any) {
@@ -66,9 +71,30 @@ export default function Chat(props: IChatProps) {
             setMessages([...messages, data])});
     }, [socket, messages]);
 
+
+/*     React.useEffect(() => {
+        socket.on('typingResponse', (data) => {
+            console.log(data);
+            setTypingStatus(data + ' is typing');
+        });
+      }, [socket]);
+ */
+
+    React.useEffect(() => {
+        if (lastMessageRef.current) {
+            lastMessageRef.current.scrollIntoView({ behavior: 'smooth'})
+        }
+    }, [messages])
+
     if (user.user === undefined) {
         return (
             <Error />
+        )
+    }
+
+    if (loading) {
+        return (
+            <Spinner />
         )
     }
     
@@ -77,7 +103,14 @@ export default function Chat(props: IChatProps) {
             <styles.chat>
                 <ChatBar socket={socket} roomId={roomId!} user={user.user}/>
                 <styles.chat__main>
-                    <ChatBody socket={socket} user={user.user} room={roomId} messages={messages}/>
+                    <ChatBody 
+                        socket={socket} 
+                        user={user.user} 
+                        room={roomId} 
+                        messages={messages} 
+                        lastMessageRef={lastMessageRef}
+                        // typingStatus={typingStatus}
+                    />
                     <ChatFooter socket={socket} user={user.user} room={roomId}/>
                 </styles.chat__main>
             </styles.chat>

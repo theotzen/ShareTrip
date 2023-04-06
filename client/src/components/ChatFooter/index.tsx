@@ -20,6 +20,10 @@ export default function ChatFooter(props: IChaFooterProps) {
     const { socket, user, room } = props
     const [message, setMessage] = useState<string>("")
 
+    const handleTyping = () => {
+        socket.emit('typing', { userId: user.id, roomId: room });
+    }
+
     const handleSendMessage = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (message.trim()) {
@@ -43,6 +47,7 @@ export default function ChatFooter(props: IChaFooterProps) {
                             className='message' 
                             value={message} 
                             onChange={e => setMessage(e.target.value)}
+                            onKeyDown={handleTyping}
                         />
                         <styles.sendBtn>SEND</styles.sendBtn>
                     </styles.chat__form>
