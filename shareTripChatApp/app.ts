@@ -7,6 +7,7 @@ const healthRoutes = require('./routes/healthcheck')
 const socketRoutes = require('./routes/socket')
 const roomRoutes = require('./routes/room')
 const logRequest = require('./middleware/logRequest')
+const auth = require('./middleware/auth')
 
 mongoose.connect(process.env.DATABASE_URL_CHATAPP,
     { 
@@ -22,6 +23,7 @@ app.use(cookieParser(`${process.env.JWT_PRIVATE_KEY}`));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(logRequest);
+// app.use(auth)
   
 
 //Origin, X-Requested-With, Content, Accept, Content-Type, Authorization

@@ -27,7 +27,10 @@ export default function ChatBar(props: IChatBarProps) {
         const fetchData = async () =>{
           setLoading(true);
           try {
-            const response = await axios.get(`http://localhost:9000/api/room/getRoomsForUser/${user.id}`);
+            const response = await axios.get(
+                `http://localhost:9000/api/room/getRoomsForUser/${user.id}`,
+                { withCredentials: true }
+            );
             setRooms(response.data.result);
           } catch (err: any) {
             console.error(err.message);
