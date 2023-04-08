@@ -1,6 +1,6 @@
 import * as React from 'react';
 import useSWR from 'swr';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { fetcher } from '../../api/api';
 import * as io from 'socket.io-client'
 
@@ -18,13 +18,20 @@ interface IChatBodyProps {
 
 export default function ChatBody(props: IChatBodyProps) {
 
-    const { socket, user, room, messages, lastMessageRef } = props
+    const { socket, user, room, messages, lastMessageRef } = props;
+    const navigate = useNavigate();
+
+    const handleLeave = () => {
+        socket.emit('leaveRoom', { userId: user.id, roomId: room }, async () => {
+            navigate('/chat/main');    
+        });
+    }
 
     return (
         <>
             <styles.chat__mainHeader>
                 <p>Chilling</p>
-                <styles.leaveChat__btn>LEAVE</styles.leaveChat__btn>
+                <styles.leaveChat__btn onClick={handleLeave}>LEAVE</styles.leaveChat__btn>
             </styles.chat__mainHeader>
 
             <styles.message__container>

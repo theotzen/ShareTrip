@@ -9,7 +9,7 @@ export class ServerSocket {
     public static instance: ServerSocket;
     public io: Server;
     public users: { [id: string]: string };
-    public rooms: {[id: string]: string[]}
+    public rooms: {[id: string]: Set<string>}
 
     constructor(server: HttpServer) {
         ServerSocket.instance = this;
@@ -58,20 +58,22 @@ export class ServerSocket {
         });
 
         
-        socket.on('join', (data, callback: (message: string) => void) => {
+        socket.on('join', async (data, callback: (message: string) => void) => {
             if (data.roomId === 'main') {
                 console.error(data.userId + ' can not join room : main');
                 callback('Nobody can join room : main');
                 return;
             }
-            if (roomController.checkIfUserIsInRoom(data.roomId, data.userId)) {
-                this.rooms[data.roomId] = this.rooms[data.roomId] ? [...this.rooms[data.roomId], data.userId] : [data.userId];
+            const isUserInRoom = await roomController.checkIfUserIsInRoom(data.roomId, data.userId)
+            if (isUserInRoom) {
+                this.rooms[data.roomId] = this.rooms[data.roomId] ? this.rooms[data.roomId].add(data.userId) : new Set<string>().add(data.userId);
                 socket.join(data.roomId);
                 console.info(data.userId + ' joined room : ' + data.roomId)
                 callback('Joined room : ' + data.roomId);
+            } else {
+                console.error(data.userId + ' can not join room : ' + data.roomId);
+                callback('Can not join room : ' + data.roomId);
             }
-            console.error(data.userId + ' can not join room : ' + data.roomId);
-            callback('Can not join room : ' + data.roomId);
         })
         
         socket.on('typing', (data) => {
@@ -80,7 +82,8 @@ export class ServerSocket {
         
         socket.on('message', async (message) => {
             try {
-                console.info(`Here are the current users in room ${message.roomId} : ` + this.rooms[message.roomId]);
+                console.info(`Here are the current users in room ${message.roomId} : ` + [...this.rooms[message.roomId]].join(' '));
+                console.info('NUMBER OF USERS IN ROOM IS : ' + this.rooms[message.roomId].size)
                 console.info('New message received from user : ' + message.userId + ' with content : ' + message.text);
                 const result = await messageController.persistMessageInDatabase(message);
                 console.info('sending message to room : ' + message.roomId);
@@ -90,8 +93,22 @@ export class ServerSocket {
             }
         })
 
+        socket.on('leaveRoom', async (data, callback: () => void) => {
+            console.info(`User ${data.userId} wants to leave room ${data.roomId}`);
+            try {
+                const result = await roomController.removeUserFromRoom(data.roomId, data.userId);
+                console.log("LEAVE ROOM RESULT : " + result);
+                socket.leave(data.roomId);
+                this.rooms[data.roomId].delete(data.userId);
+                console.info(`Here are the current users in room ${data.roomId} : ` + [...this.rooms[data.roomId]].join(' '));
+                callback();
+            } catch (err: any) {
+                console.error(err.message);
+            }
+        })
+
         socket.on('disconnect', () => {
-                console.info('Disconnect received from socket: ' + socket.id);
+                console.info('Disconnect received from socket : ' + socket.id);
 
                 const userId = this.GetUserIDFromSocketId(socket.id);
 

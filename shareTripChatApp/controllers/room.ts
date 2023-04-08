@@ -18,9 +18,29 @@ exports.createRoom = async (req: TypedRequestBody<RoomPayload>,
 }
 
 
+exports.getRoomById = async (req: express.Request,
+    res: express.Response) => {
+    try {
+        const result = await Room.find({
+            _id: req.params.roomId
+        })
+        res.status(201).json({ result })
+    }
+    catch (err) {
+        new AppError(err.message, err.code);
+    }
+}
+
+
 exports.addUserToRoom = async (req: TypedRequestBody<RoomUserId>,
     res: express.Response) => {
     try {
+        const isUserInRoom = await checkIfUserIsInRoom(req.body.roomId, req.body.userId);
+        console.info(isUserInRoom);
+        if (isUserInRoom) {
+            res.status(400).json({ message: 'User already in room'});
+            return;
+        }
         const result = await Room.updateOne(
             {_id: req.body.roomId},
             { 
@@ -50,7 +70,7 @@ exports.getRoomsForUser = async (req: express.Request,
 }
 
 
-exports.checkIfUserIsInRoom = async (roomId: string, userId: string) => {
+export async function checkIfUserIsInRoom(roomId: string, userId: string) {
     try {
         const room = await Room.findOne({
             _id: roomId
@@ -60,8 +80,20 @@ exports.checkIfUserIsInRoom = async (roomId: string, userId: string) => {
             return false;
         }
         return true;
+    } catch (err) {
+        new AppError(err.message, err.code);
     }
-    catch (err) {
+}
+
+
+exports.removeUserFromRoom = async (roomId: string, userId: string) => {
+    try {
+        const result = await Room.updateOne(
+            { _id: roomId },
+            { $pull: { users: userId }}
+        )
+        return result["acknowledged"];
+    } catch (err) {
         new AppError(err.message, err.code);
     }
 }

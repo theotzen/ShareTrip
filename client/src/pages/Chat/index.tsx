@@ -43,7 +43,7 @@ export default function Chat(props: IChatProps) {
         }, async (message: string) => {
             console.info(message)
         });
-    }, []);
+    }, [roomId]);
 
 
     React.useEffect(() => {

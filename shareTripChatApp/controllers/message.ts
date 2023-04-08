@@ -112,7 +112,6 @@ exports.getMessagesByUserId = async (req: express.Request,
 exports.getMessagesByRoomId = async (req: express.Request,
     res: express.Response) => {
     try {
-        console.info('COOKIES : ', req.cookies);
         const result = await Message.find({
             roomId: req.params.roomId
         })
