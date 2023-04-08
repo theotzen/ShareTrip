@@ -6,6 +6,7 @@ import * as io from "socket.io-client";
 import * as styles from '../../pages/Chat/style';
 import { Room, UserResponseSchema } from '../../apiTypes';
 import axios from 'axios';
+import ChatBarRoom from '../ChatBarRoom';
 
 interface IChatBarProps {
     socket: io.Socket;
@@ -52,7 +53,7 @@ export default function ChatBar(props: IChatBarProps) {
                         {rooms
                         ?
                         rooms.map((room, i) => {
-                                return <button key={i} onClick={() => navigate(`/chat/${room._id}`)}>{room.name}</button>
+                                return <ChatBarRoom room={room}/>
                             })
                         :
                         <p>No channel yet !</p>}
