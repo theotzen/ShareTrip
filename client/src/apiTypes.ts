@@ -45,3 +45,11 @@ export interface Room {
   dateCreated: Date,
   dateUpdated: Date
 }
+export interface RoomWithLastMessage {
+  name: string,
+  users: string[],
+  _id: string,
+  dateCreated: Date,
+  dateUpdated: Date
+  lastMessageDate: Date;
+}

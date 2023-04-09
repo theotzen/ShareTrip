@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { fetcher } from '../../api/api';
 import * as io from "socket.io-client";
 import * as styles from '../../pages/Chat/style';
-import { Room, UserResponseSchema } from '../../apiTypes';
+import { Message, Room, RoomWithLastMessage, UserResponseSchema } from '../../apiTypes';
 import axios from 'axios';
 import ChatBarRoom from '../ChatBarRoom';
 
@@ -12,34 +12,35 @@ interface IChatBarProps {
     socket: io.Socket;
     roomId: string;
     user: UserResponseSchema;
+    message: Message;
 }
 
 export default function ChatBar(props: IChatBarProps) {
 
-    const { socket, roomId, user } = props;
+    const { socket, roomId, user, message } = props;
     const navigate = useNavigate();
 
-    const [rooms, setRooms] = React.useState<Room[]>([]);
+    console.info(message)
+
+    const [rooms, setRooms] = React.useState<RoomWithLastMessage[]>([]);
     const [loading, setLoading] = React.useState<Boolean>(false);
 
-    console.info('from chat bar socket ', socket.id);
-
     React.useEffect(() => {
-        const fetchData = async () =>{
-          setLoading(true);
-          try {
-            const response = await axios.get(
-                `http://localhost:9000/api/room/getRoomsForUser/${user.id}`,
-                { withCredentials: true }
-            );
-            setRooms(response.data.result);
-          } catch (err: any) {
-            console.error(err.message);
-          }
-          setLoading(false);
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get(
+                    `http://localhost:9000/api/room/getRoomsForUserWithLastMessageTime/${user.id}`,
+                    { withCredentials: true }
+                );
+                setRooms(response.data.result);
+            } catch (err: any) {
+                console.error(err.message);
+            }
+            setLoading(false);
         }
         fetchData();
-      }, [roomId]);
+    }, [roomId, message]);
 
     return (
         <>
@@ -51,12 +52,12 @@ export default function ChatBar(props: IChatBarProps) {
                     </styles.chat__header>
                     <styles.chat__users>
                         {rooms
-                        ?
-                        rooms.map((room, i) => {
-                                return <ChatBarRoom room={room}/>
+                            ?
+                            rooms.map((room, i) => {
+                                return <ChatBarRoom room={room} />
                             })
-                        :
-                        <p>No channel yet !</p>}
+                            :
+                            <p>No channel yet !</p>}
                     </styles.chat__users>
                 </div>
             </styles.chat__sidebar>

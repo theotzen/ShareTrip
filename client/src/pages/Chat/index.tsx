@@ -14,21 +14,18 @@ import Spinner from '../../components/Spinner';
 import axios from 'axios';
 
 
-interface IChatProps {}
+interface IChatProps { }
 
 export default function Chat(props: IChatProps) {
-    
+
     const user = React.useContext(UserContext);
     const { socket, users } = React.useContext(SocketContext).SocketState
 
     const { roomId } = useParams();
 
-    if (socket === undefined ){
+    if (socket === undefined) {
         return <Spinner />
     }
-
-    console.log('⚡', socket.id)
-    console.log('⚡⚡⚡⚡', roomId)
 
     const [messages, setMessages] = React.useState<Message[]>([]);
     const [loading, setLoading] = React.useState<boolean>(false);
@@ -47,42 +44,41 @@ export default function Chat(props: IChatProps) {
 
 
     React.useEffect(() => {
-        const fetchData = async () =>{
-          setLoading(true);
-          try {
-            const response = await axios.get(
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get(
                     `http://localhost:9000/api/message/getMessagesByRoomId/${roomId}`,
                     { withCredentials: true }
                 );
-            console.info(`Messages gotten from chat for room ${roomId}`, response.data.result);
-            setMessages((prev) => [...response.data.result]);
-          } catch (err: any) {
-            console.error(err.message);
-          }
-          setLoading(false);
+                setMessages((prev) => [...response.data.result]);
+            } catch (err: any) {
+                console.error(err.message);
+            }
+            setLoading(false);
         }
         fetchData();
-      }, [roomId]);
+    }, [roomId]);
 
 
     React.useEffect(() => {
         socket.on('message', (data) => {
-            console.log('From the user page : ', data)
-            setMessages([...messages, data])});
+            setMessages([...messages, data])
+        });
     }, [socket, messages]);
 
 
-/*     React.useEffect(() => {
-        socket.on('typingResponse', (data) => {
-            console.log(data);
-            setTypingStatus(data + ' is typing');
-        });
-      }, [socket]);
- */
+    /*     React.useEffect(() => {
+            socket.on('typingResponse', (data) => {
+                console.log(data);
+                setTypingStatus(data + ' is typing');
+            });
+          }, [socket]);
+     */
 
     React.useEffect(() => {
         if (lastMessageRef.current) {
-            lastMessageRef.current.scrollIntoView({ behavior: 'smooth'})
+            lastMessageRef.current.scrollIntoView({ behavior: 'smooth' })
         }
     }, [messages])
 
@@ -97,21 +93,26 @@ export default function Chat(props: IChatProps) {
             <Spinner />
         )
     }
-    
+
     return (
         <>
             <styles.chat>
-                <ChatBar socket={socket} roomId={roomId!} user={user.user}/>
+                <ChatBar
+                    socket={socket}
+                    roomId={roomId!}
+                    user={user.user}
+                    message={messages[messages.length - 1]}
+                />
                 <styles.chat__main>
-                    <ChatBody 
-                        socket={socket} 
-                        user={user.user} 
-                        room={roomId} 
-                        messages={messages} 
+                    <ChatBody
+                        socket={socket}
+                        user={user.user}
+                        room={roomId}
+                        messages={messages}
                         lastMessageRef={lastMessageRef}
-                        // typingStatus={typingStatus}
+                    // typingStatus={typingStatus}
                     />
-                    <ChatFooter socket={socket} user={user.user} room={roomId}/>
+                    <ChatFooter socket={socket} user={user.user} room={roomId} />
                 </styles.chat__main>
             </styles.chat>
         </>

@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as styles from '../../pages/Chat/style';
-import { Room } from '../../apiTypes';
+import { Message, RoomWithLastMessage } from '../../apiTypes';
 
 interface IChatBarRoomProps {
-    room: Room;
+    room: RoomWithLastMessage;
 }
 
 export default function ChatBarRoom(props: IChatBarRoomProps) {
@@ -17,7 +17,10 @@ export default function ChatBarRoom(props: IChatBarRoomProps) {
         const updated = new Date(dateUpdated);
         const diffInMinutes = (now.valueOf() - updated.valueOf()) / 60000;
 
-        if (diffInMinutes < 60) {
+        if (diffInMinutes < 2) {
+            return 'active just now'
+        }
+        else if (diffInMinutes < 60) {
             return diffInMinutes.toFixed(0) + 'min ago'
         }
         else if (diffInMinutes > 60 && diffInMinutes < 1440) {
@@ -35,7 +38,7 @@ export default function ChatBarRoom(props: IChatBarRoomProps) {
                     {room.name}
                 </styles.room_title_chat_bar>
                 <styles.room_time_chat_bar>
-                    {getTimeToDisplay(room.dateUpdated)}
+                    {getTimeToDisplay(room.lastMessageDate)}
                 </styles.room_time_chat_bar>
             </styles.room_upper_div_chat_bar>
             <styles.room_active_users_chat_bar>
