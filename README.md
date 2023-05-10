@@ -34,7 +34,8 @@ The **Front End** will be constructed with
 The **Back End** will be constructed with
 
 - FastAPI
-- MongoDB + pymongo
+- MongoDB
+- Node (with Express)
 - Socket.io
-- Nginx as an API gateway
-- JWT for OAuth2
+- Nginx
+- OAuth2
