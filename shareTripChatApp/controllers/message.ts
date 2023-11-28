@@ -17,14 +17,77 @@ exports.createMessage = async (req: TypedRequestBody<MessagePayload>,
     }
 }
 
+exports.persistMessageInDatabase = async (messageToSave: MessagePayload) => {
+    try {
+        const message = new Message(messageToSave)
+        const result = await message.save();
+        return {result}
+    }
+    catch (err) {
+        new AppError(err.message, err.code);
+    }
+}
+
 
 exports.getMessageById = async (req: express.Request,
         res: express.Response) => {
     try {
         const message = await Message.findOne({
-            _id: req.param.id
+            _id: req.params.id
         })
         res.status(200).json(message);
+    }
+    catch (err) {
+        new AppError(err.message, err.code);
+    }
+}
+
+exports.getAllMessages = async (req: express.Request,
+    res: express.Response) => {
+    try {
+        const messages = await Message.find()
+        res.status(200).json(messages);
+    }
+    catch (err) {
+        new AppError(err.message, err.code);
+    }
+}
+
+exports.deleteMessageById = async (req: express.Request,
+    res: express.Response) => {
+    try {
+        const result = await Message.deleteOne({
+            _id: req.params.id
+        })
+        res.status(200).json(result);
+    }
+    catch (err) {
+        new AppError(err.message, err.code);
+    }
+}
+
+
+exports.deleteMessagesByUserId = async (req: express.Request,
+    res: express.Response) => {
+    try {
+        const result = await Message.deleteOne({
+            userId: req.params.userId
+        })
+        res.status(200).json(result);
+    }
+    catch (err) {
+        new AppError(err.message, err.code);
+    }
+}
+
+
+exports.deleteMessagesByRoomId = async (req: express.Request,
+    res: express.Response) => {
+    try {
+        const result = await Message.deleteMany({
+            roomId: req.params.roomId
+        })
+        res.status(200).json(result);
     }
     catch (err) {
         new AppError(err.message, err.code);
@@ -35,10 +98,10 @@ exports.getMessageById = async (req: express.Request,
 exports.getMessagesByUserId = async (req: express.Request,
         res: express.Response) => {
     try {
-        const message = await Message.find({
-            userId: req.param.userId
+        const result = await Message.find({
+            userId: req.params.userId
         })
-        res.status(200).json(message);
+        res.status(200).json({result});
     }
     catch (err) {
         new AppError(err.message, err.code);
@@ -46,15 +109,15 @@ exports.getMessagesByUserId = async (req: express.Request,
 }
 
 
-exports.getMessagesBySocketId = async (req: express.Request,
+exports.getMessagesByRoomId = async (req: express.Request,
     res: express.Response) => {
-try {
-    const message = await Message.find({
-        socketId: req.param.socketId
-    })
-    res.status(200).json(message);
-}
-catch (err) {
-    new AppError(err.message, err.code);
-}
+    try {
+        const result = await Message.find({
+            roomId: req.params.roomId
+        })
+        res.status(200).json({result});
+    }
+    catch (err) {
+        new AppError(err.message, err.code);
+    }
 }

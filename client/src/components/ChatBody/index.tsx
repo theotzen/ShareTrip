@@ -1,6 +1,6 @@
 import * as React from 'react';
 import useSWR from 'swr';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { fetcher } from '../../api/api';
 import * as io from 'socket.io-client'
 
@@ -13,17 +13,25 @@ interface IChatBodyProps {
     user: UserResponseSchema;
     room: string|undefined;
     messages: Message[];
+    lastMessageRef: React.Ref<HTMLDivElement>;
 }
 
 export default function ChatBody(props: IChatBodyProps) {
 
-    const { socket, user, room, messages } = props
+    const { socket, user, room, messages, lastMessageRef } = props;
+    const navigate = useNavigate();
+
+    const handleLeave = () => {
+        socket.emit('leaveRoom', { userId: user.id, roomId: room }, async () => {
+            navigate('/chat/main');    
+        });
+    }
 
     return (
         <>
             <styles.chat__mainHeader>
                 <p>Chilling</p>
-                <styles.leaveChat__btn>LEAVE</styles.leaveChat__btn>
+                <styles.leaveChat__btn onClick={handleLeave}>LEAVE</styles.leaveChat__btn>
             </styles.chat__mainHeader>
 
             <styles.message__container>
@@ -31,7 +39,7 @@ export default function ChatBody(props: IChatBodyProps) {
                     messages.map( (message, i) => (
                         message.userId === user.id ?
                         <>
-                            <styles.message__chats key={i}>
+                            <styles.message__chats key={`${i}${message._id}`}>
                                 <styles.sender__name>{message.name}</styles.sender__name>
                                 <styles.message__sender>
                                     {message.text}
@@ -43,7 +51,7 @@ export default function ChatBody(props: IChatBodyProps) {
                         </> 
                         :
                         <>
-                            <styles.message__chats key={i}>
+                            <styles.message__chats key={`${i}${message._id}`}>
                                 <styles.sender__name_for_recipient>{message.name}</styles.sender__name_for_recipient>
                                 <styles.message__recipient>
                                     {message.text}
@@ -56,6 +64,7 @@ export default function ChatBody(props: IChatBodyProps) {
                         )
                     )
                 }
+                <div ref={lastMessageRef} />
             </styles.message__container>
         </>
     );

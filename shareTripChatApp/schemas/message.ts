@@ -4,7 +4,7 @@ export interface UserId {
 
 export interface MessagePayload {
     userId: String,
-    socketId: String,
+    roomId: String,
     content: String,
     dateSent: Date
 }

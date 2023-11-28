@@ -30,14 +30,14 @@ export const chat_old = styled.div`
 export const chat__sidebar = styled.div`
   height: 100%;
   background-color: ${colors.backgroundLight};
-  width: 15%;
+  width: 20%;
   padding-left: 20px;
 `
 export const chat__main = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
-  width: 85%;
+  width: 80%;
   background-color: ${colors.backgroundLight};
   align-items: center;
   justify-content: center;
@@ -138,7 +138,7 @@ export const message__recipient = styled.div`
     font-size: 15px;
     color: black;
 `
-export const message__sender= styled.div`
+export const message__sender = styled.div`
     background-color: #9a41e8;
     width: fit-content;
     max-width: 40%;
@@ -168,7 +168,73 @@ export const sender__name_for_recipient = styled.div`
 
 export const message__status = styled.div`
   text-align: right;
-  font-size: 10px;
+  font-size: 0.9vh;
   font-style: italic;
   margin-right: 15px;
+`
+
+export const room_chat_bar = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+
+    width: 98%;
+    height: auto;
+
+    margin-top: 5px;
+    margin-bottom: 5px;
+
+    cursor: pointer;
+
+    &:hover {
+      background-color: ${colors.backgroundMedium};
+      width: 100%;
+    }
+`
+
+export const room_upper_div_chat_bar = styled.div`
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+    height: auto;
+
+    overflow: hidden;
+`
+
+export const room_title_chat_bar = styled.div`
+    text-align: left;
+    margin-left: 0px;
+    font-size: 1.2vh;
+    color: black;
+    font-weight: 500;
+    vertical-align:middle;
+`
+
+export const room_time_chat_bar = styled.div`
+    text-align: right;
+    margin-left: 0px;
+    font-size: 0.8vh;
+    color: #a9a9a9;
+    vertical-align:middle;
+`
+
+export const room_active_users_chat_bar = styled.div`
+
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    justify-content: start;
+
+    width: 100%;
+    height: auto;
+
+    text-align: left;
+    margin-left: 0px;
+    font-size: 1.1vh;
+    color: #a9a9a9;
+    vertical-align:middle;
 `

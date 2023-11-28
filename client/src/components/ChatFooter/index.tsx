@@ -27,9 +27,7 @@ export default function ChatFooter(props: IChaFooterProps) {
             text: message,
             name: user.name,
             userId: user.id,
-            id: `${socket.id}${Math.random()}`,
-            socketID: socket.id,
-            room: room
+            roomId: room
         });
         }
         setMessage('');

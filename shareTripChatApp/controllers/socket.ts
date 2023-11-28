@@ -1,15 +1,20 @@
 import { Server as HttpServer } from 'http';
 import { Socket, Server } from 'socket.io';
 import express from 'express';
+const AppError = require('../errors/AppError');
+const roomController = require('../controllers/room')
+const messageController = require('../controllers/message')
 
 export class ServerSocket {
     public static instance: ServerSocket;
     public io: Server;
     public users: { [id: string]: string };
+    public rooms: {[id: string]: Set<string>}
 
     constructor(server: HttpServer) {
         ServerSocket.instance = this;
         this.users = {};
+        this.rooms = {};
         this.io = new Server(server, {
             serveClient: false,
             pingInterval: 10000,
@@ -26,7 +31,7 @@ export class ServerSocket {
     StartListeners = (socket: Socket) => {
         console.info('Message from socket ' + socket.id);
 
-        socket.on('handshake', (userId: string, callback: (id: string, users: string[]) => void) => {
+        socket.on('handshake', (userId: string, callback: (userId: string, users: string[]) => void) => {
             console.info('Handshake from socket ' + socket.id);
 
             console.info('Message coming from user : ' + userId);
@@ -52,13 +57,58 @@ export class ServerSocket {
             callback(userId, users);
         });
 
-        socket.on('message', (message) => {
-            console.info('New messager received from user : ' + message.userId + ' with content : ' + message.text);
-            this.io.emit('message', {...message});
+        
+        socket.on('join', async (data, callback: (message: string) => void) => {
+            if (data.roomId === 'main') {
+                console.error(data.userId + ' can not join room : main');
+                callback('Nobody can join room : main');
+                return;
+            }
+            const isUserInRoom = await roomController.checkIfUserIsInRoom(data.roomId, data.userId)
+            if (isUserInRoom) {
+                this.rooms[data.roomId] = this.rooms[data.roomId] ? this.rooms[data.roomId].add(data.userId) : new Set<string>().add(data.userId);
+                socket.join(data.roomId);
+                console.info(data.userId + ' joined room : ' + data.roomId)
+                callback('Joined room : ' + data.roomId);
+            } else {
+                console.error(data.userId + ' can not join room : ' + data.roomId);
+                callback('Can not join room : ' + data.roomId);
+            }
+        })
+        
+        socket.on('typing', (data) => {
+            socket.to(data.roomId).emit('typingResponse', data.userId)
+        });
+        
+        socket.on('message', async (message) => {
+            try {
+                console.info(`Here are the current users in room ${message.roomId} : ` + [...this.rooms[message.roomId]].join(' '));
+                console.info('NUMBER OF USERS IN ROOM IS : ' + this.rooms[message.roomId].size)
+                console.info('New message received from user : ' + message.userId + ' with content : ' + message.text);
+                const result = await messageController.persistMessageInDatabase(message);
+                console.info('sending message to room : ' + message.roomId);
+                this.io.to(message.roomId).emit('message', {...message});
+            } catch (err: any) {
+                console.error(err.message);
+            }
+        })
+
+        socket.on('leaveRoom', async (data, callback: () => void) => {
+            console.info(`User ${data.userId} wants to leave room ${data.roomId}`);
+            try {
+                const result = await roomController.removeUserFromRoom(data.roomId, data.userId);
+                console.log("LEAVE ROOM RESULT : " + result);
+                socket.leave(data.roomId);
+                this.rooms[data.roomId].delete(data.userId);
+                console.info(`Here are the current users in room ${data.roomId} : ` + [...this.rooms[data.roomId]].join(' '));
+                callback();
+            } catch (err: any) {
+                console.error(err.message);
+            }
         })
 
         socket.on('disconnect', () => {
-                console.info('Disconnect received from socket: ' + socket.id);
+                console.info('Disconnect received from socket : ' + socket.id);
 
                 const userId = this.GetUserIDFromSocketId(socket.id);
 
